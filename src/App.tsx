@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useKV } from '@github/spark/hooks';
+import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
 import { Quiz } from '@/components/Quiz';
 import { QuizResults } from '@/components/QuizResults';
 import { ProgressTracking } from '@/components/ProgressTracking';
+import { Leaderboard } from '@/components/Leaderboard';
+import { UserProfileComponent } from '@/components/UserProfileComponent';
 import { quizTopics, getQuestionsByTopic, getRandomQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'topic-selection' | 'quiz' | 'results' | 'progress';
+type AppState = 'auth' | 'topic-selection' | 'quiz' | 'results' | 'progress' | 'leaderboard' | 'profile';
 
 interface UserProgress {
   [topicId: string]: {
@@ -20,14 +23,35 @@ interface UserProgress {
 }
 
 function App() {
-  const [appState, setAppState] = useState<AppState>('topic-selection');
+  const [appState, setAppState] = useState<AppState>('auth');
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [currentTopic, setCurrentTopic] = useState<string>('');
   const [quizScore, setQuizScore] = useState(0);
   const [userProgress, setUserProgress] = useKV<UserProgress>('quiz-progress', {});
 
-  // Initialize progress for all topics
+  // Check for existing user session on app load
   useEffect(() => {
+    const savedUser = localStorage.getItem('dsa-quiz-current-user');
+    if (savedUser) {
+      try {
+        const user: UserProfile = JSON.parse(savedUser);
+        setCurrentUser(user);
+        setAppState('topic-selection');
+      } catch (error) {
+        localStorage.removeItem('dsa-quiz-current-user');
+      }
+    }
+  }, []);
+
+  // Use user-specific progress key
+  const progressKey = currentUser ? `quiz-progress-${currentUser.id}` : 'quiz-progress';
+  const [userProgress, setUserProgress] = useKV<UserProgress>(progressKey, {});
+
+  // Initialize progress for all topics when user changes
+  useEffect(() => {
+    if (!currentUser) return;
+    
     setUserProgress((currentProgress) => {
       const updatedProgress = { ...currentProgress };
       let hasChanges = false;
@@ -45,7 +69,32 @@ function App() {
 
       return hasChanges ? updatedProgress : currentProgress;
     });
-  }, [setUserProgress]);
+  }, [currentUser, setUserProgress]);
+
+  const handleLogin = (user: UserProfile) => {
+    setCurrentUser(user);
+    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(user));
+    setAppState('topic-selection');
+  };
+
+  const handleRegister = (user: UserProfile) => {
+    setCurrentUser(user);
+    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(user));
+    setAppState('topic-selection');
+    toast.success('Welcome to DSA Quiz Master! 🎉');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('dsa-quiz-current-user');
+    setAppState('auth');
+    toast.success('Logged out successfully');
+  };
+
+  const handleUpdateProfile = (updatedUser: UserProfile) => {
+    setCurrentUser(updatedUser);
+    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(updatedUser));
+  };
 
   const handleTopicSelect = (topicId: string) => {
     let questions: QuizQuestion[];
@@ -74,7 +123,7 @@ function App() {
     setQuizScore(score);
     
     // Update progress
-    if (currentTopic !== 'random') {
+    if (currentTopic !== 'random' && currentUser) {
       setUserProgress((currentProgress) => {
         const updatedProgress = { ...currentProgress };
         const topicProgress = updatedProgress[currentTopic] || {
@@ -96,11 +145,28 @@ function App() {
         return updatedProgress;
       });
 
-      // Show achievement toast for new best score
-      const currentBest = userProgress[currentTopic]?.bestScore || 0;
-      const newScore = Math.round((score / totalQuestions) * 100);
-      if (newScore > currentBest && newScore >= 80) {
-        toast.success(`New best score: ${newScore}%! 🎉`);
+      // Update user's overall stats
+      const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
+      const userIndex = users.findIndex((u: UserProfile) => u.id === currentUser.id);
+      
+      if (userIndex !== -1) {
+        const currentBest = userProgress[currentTopic]?.bestScore || 0;
+        const newScore = Math.round((score / totalQuestions) * 100);
+        
+        users[userIndex].totalQuizzes += 1;
+        
+        // Update best overall score (average of all topic best scores)
+        const allScores = Object.values(userProgress).map(p => p.bestScore).filter(s => s > 0);
+        allScores.push(newScore);
+        users[userIndex].bestOverallScore = Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
+        
+        localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
+        setCurrentUser(users[userIndex]);
+        
+        // Show achievement toast for new best score
+        if (newScore > currentBest && newScore >= 80) {
+          toast.success(`New best score: ${newScore}%! 🎉`);
+        }
       }
     }
 
@@ -121,6 +187,14 @@ function App() {
     setAppState('progress');
   };
 
+  const handleViewLeaderboard = () => {
+    setAppState('leaderboard');
+  };
+
+  const handleViewProfile = () => {
+    setAppState('profile');
+  };
+
   const getCurrentTopicName = () => {
     if (currentTopic === 'random') return 'Mixed Topics';
     const topic = quizTopics.find(t => t.id === currentTopic);
@@ -134,12 +208,22 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      {appState === 'topic-selection' && (
+      {appState === 'auth' && (
+        <UserAuth
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+        />
+      )}
+
+      {appState === 'topic-selection' && currentUser && (
         <TopicSelection
           topics={quizTopics}
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
+          onViewLeaderboard={handleViewLeaderboard}
+          onViewProfile={handleViewProfile}
           userProgress={userProgress}
+          currentUser={currentUser}
         />
       )}
 
@@ -166,6 +250,22 @@ function App() {
         <ProgressTracking
           onBack={handleBackToTopics}
           userProgress={userProgress}
+        />
+      )}
+
+      {appState === 'leaderboard' && currentUser && (
+        <Leaderboard
+          currentUser={currentUser}
+          onBack={handleBackToTopics}
+        />
+      )}
+
+      {appState === 'profile' && currentUser && (
+        <UserProfileComponent
+          user={currentUser}
+          onBack={handleBackToTopics}
+          onLogout={handleLogout}
+          onUpdateProfile={handleUpdateProfile}
         />
       )}
 

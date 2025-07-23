@@ -2,18 +2,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, TrendingUp, Award, ChartBar } from '@phosphor-icons/react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { BookOpen, TrendingUp, Award, ChartBar, Trophy, User } from '@phosphor-icons/react';
 import { QuizTopic, getQuestionsByTopic } from '@/lib/quiz-data';
+import { UserProfile } from './UserAuth';
 import { motion } from 'framer-motion';
 
 interface TopicSelectionProps {
   topics: QuizTopic[];
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
+  onViewLeaderboard: () => void;
+  onViewProfile: () => void;
   userProgress: Record<string, { completed: number; total: number; bestScore: number }>;
+  currentUser: UserProfile;
 }
 
-export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProgress }: TopicSelectionProps) {
+export function TopicSelection({ 
+  topics, 
+  onTopicSelect, 
+  onViewProgress, 
+  onViewLeaderboard, 
+  onViewProfile, 
+  userProgress, 
+  currentUser 
+}: TopicSelectionProps) {
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -38,12 +51,55 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
     return scores.reduce((sum, p) => sum + p.bestScore, 0) / scores.length;
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
+      {/* User Header */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div className="flex items-center gap-4">
+          <Avatar className="w-12 h-12">
+            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              {getInitials(currentUser.displayName)}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="text-xl font-semibold">Welcome back, {currentUser.displayName}!</h2>
+            <p className="text-muted-foreground">Ready to level up your DSA skills?</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onViewProfile}>
+            <User size={16} className="mr-2" />
+            Profile
+          </Button>
+          <Button variant="outline" size="sm" onClick={onViewLeaderboard}>
+            <Trophy size={16} className="mr-2" />
+            Leaderboard
+          </Button>
+          <Button variant="outline" size="sm" onClick={onViewProgress}>
+            <ChartBar size={16} className="mr-2" />
+            Progress
+          </Button>
+        </div>
+      </motion.div>
+
       <div className="text-center space-y-4">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
           className="text-4xl font-bold text-foreground"
         >
           DSA Quiz Master
@@ -51,7 +107,7 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
         <motion.p 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="text-lg text-muted-foreground max-w-2xl mx-auto"
         >
           Master Data Structures and Algorithms through interactive quizzes with detailed explanations and progress tracking.
@@ -61,7 +117,7 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.3 }}
         className="grid md:grid-cols-3 gap-6 mb-8"
       >
         <Card>
@@ -109,10 +165,6 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
 
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Choose a Topic</h2>
-        <Button variant="outline" onClick={onViewProgress}>
-          <ChartBar size={16} className="mr-2" />
-          View Progress
-        </Button>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -125,7 +177,7 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
               key={topic.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
+              transition={{ delay: 0.4 + index * 0.1 }}
             >
               <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer group">
                 <CardHeader>
@@ -180,7 +232,7 @@ export function TopicSelection({ topics, onTopicSelect, onViewProgress, userProg
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 0.9 }}
         className="text-center pt-8"
       >
         <Button 
