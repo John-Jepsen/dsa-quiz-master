@@ -22,4 +22,16 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
+  // Configure base path for GitHub Pages deployment
+  base: process.env.NODE_ENV === 'production' ? '/spark-template/' : '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      }
+    }
+  }
 });
