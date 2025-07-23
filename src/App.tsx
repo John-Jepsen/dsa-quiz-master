@@ -28,7 +28,6 @@ function App() {
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [currentTopic, setCurrentTopic] = useState<string>('');
   const [quizScore, setQuizScore] = useState(0);
-  const [userProgress, setUserProgress] = useKV<UserProgress>('quiz-progress', {});
 
   // Check for existing user session on app load
   useEffect(() => {
