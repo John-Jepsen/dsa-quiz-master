@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, ChartBar, Trophy, User } from '@phosphor-icons/react';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User } from 'lucide-react';
 import { QuizTopic, getQuestionsByTopic } from '@/lib/quiz-data';
 import { UserProfile } from './UserAuth';
 import { motion } from 'framer-motion';
@@ -18,14 +18,14 @@ interface TopicSelectionProps {
   currentUser: UserProfile;
 }
 
-export function TopicSelection({ 
-  topics, 
-  onTopicSelect, 
-  onViewProgress, 
-  onViewLeaderboard, 
-  onViewProfile, 
-  userProgress, 
-  currentUser 
+export function TopicSelection({
+  topics,
+  onTopicSelect,
+  onViewProgress,
+  onViewLeaderboard,
+  onViewProfile,
+  userProgress,
+  currentUser
 }: TopicSelectionProps) {
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -63,7 +63,7 @@ export function TopicSelection({
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* User Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
@@ -89,14 +89,14 @@ export function TopicSelection({
             Leaderboard
           </Button>
           <Button variant="outline" size="sm" onClick={onViewProgress}>
-            <ChartBar size={16} className="mr-2" />
+            <BarChart3 size={16} className="mr-2" />
             Progress
           </Button>
         </div>
       </motion.div>
 
       <div className="text-center space-y-4">
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -104,7 +104,7 @@ export function TopicSelection({
         >
           DSA Quiz Master
         </motion.h1>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -114,7 +114,7 @@ export function TopicSelection({
         </motion.p>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -171,7 +171,7 @@ export function TopicSelection({
         {topics.map((topic, index) => {
           const progress = userProgress[topic.id] || { completed: 0, total: topic.questionCount, bestScore: 0 };
           const completionRate = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
-          
+
           return (
             <motion.div
               key={topic.id}
@@ -206,7 +206,7 @@ export function TopicSelection({
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {topic.description}
                   </p>
-                  
+
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Progress</span>
@@ -215,7 +215,7 @@ export function TopicSelection({
                     <Progress value={completionRate} className="h-2" />
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={() => onTopicSelect(topic.id)}
                     className="w-full"
                     variant={completionRate === 100 ? "outline" : "default"}
@@ -229,14 +229,14 @@ export function TopicSelection({
         })}
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
         className="text-center pt-8"
       >
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="lg"
           onClick={() => onTopicSelect('random')}
           className="px-8"

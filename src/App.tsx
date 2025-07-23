@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useKV } from '@github/spark/hooks';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
 import { Quiz } from '@/components/Quiz';
@@ -45,12 +45,12 @@ function App() {
 
   // Use user-specific progress key
   const progressKey = currentUser ? `quiz-progress-${currentUser.id}` : 'quiz-progress';
-  const [userProgress, setUserProgress] = useKV<UserProgress>(progressKey, {});
+  const [userProgress, setUserProgress] = useLocalStorage<UserProgress>(progressKey, {});
 
   // Initialize progress for all topics when user changes
   useEffect(() => {
     if (!currentUser) return;
-    
+
     setUserProgress((currentProgress) => {
       const updatedProgress = { ...currentProgress };
       let hasChanges = false;
@@ -120,7 +120,7 @@ function App() {
 
   const handleQuizComplete = (score: number, totalQuestions: number) => {
     setQuizScore(score);
-    
+
     // Update progress
     if (currentTopic !== 'random' && currentUser) {
       setUserProgress((currentProgress) => {
@@ -147,21 +147,21 @@ function App() {
       // Update user's overall stats
       const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
       const userIndex = users.findIndex((u: UserProfile) => u.id === currentUser.id);
-      
+
       if (userIndex !== -1) {
         const currentBest = userProgress[currentTopic]?.bestScore || 0;
         const newScore = Math.round((score / totalQuestions) * 100);
-        
+
         users[userIndex].totalQuizzes += 1;
-        
+
         // Update best overall score (average of all topic best scores)
         const allScores = Object.values(userProgress).map(p => p.bestScore).filter(s => s > 0);
         allScores.push(newScore);
         users[userIndex].bestOverallScore = Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
-        
+
         localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
         setCurrentUser(users[userIndex]);
-        
+
         // Show achievement toast for new best score
         if (newScore > currentBest && newScore >= 80) {
           toast.success(`New best score: ${newScore}%! 🎉`);

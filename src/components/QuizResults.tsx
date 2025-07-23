@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Target, TrendingUp, RotateCcw, Home } from '@phosphor-icons/react';
+import { Trophy, Target, TrendingUp, RotateCcw, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface QuizResultsProps {
@@ -14,17 +14,17 @@ interface QuizResultsProps {
   previousBestScore?: number;
 }
 
-export function QuizResults({ 
-  score, 
-  totalQuestions, 
-  topicName, 
-  onRetakeQuiz, 
+export function QuizResults({
+  score,
+  totalQuestions,
+  topicName,
+  onRetakeQuiz,
   onBackToTopics,
   previousBestScore = 0
 }: QuizResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100);
   const isNewBest = percentage > previousBestScore;
-  
+
   const getPerformanceLevel = (percentage: number) => {
     if (percentage >= 90) return { level: 'Excellent', color: 'text-green-600', emoji: '🏆' };
     if (percentage >= 80) return { level: 'Great', color: 'text-blue-600', emoji: '🎉' };
@@ -80,7 +80,7 @@ export function QuizResults({
                 <div className="text-lg text-muted-foreground">
                   {score} out of {totalQuestions} correct
                 </div>
-                <Badge 
+                <Badge
                   className={`${performance.color} bg-transparent border-current text-lg px-4 py-1`}
                   variant="outline"
                 >
@@ -97,7 +97,7 @@ export function QuizResults({
                   transition={{ delay: 0.5 }}
                   className="flex items-center justify-center gap-2 p-3 bg-accent/10 rounded-lg border border-accent/20"
                 >
-                  <Trophy size={20} className="text-accent" weight="fill" />
+                  <Trophy size={20} className="text-accent" />
                   <span className="text-accent font-medium">New Best Score!</span>
                 </motion.div>
               )}

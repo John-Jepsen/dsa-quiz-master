@@ -21,7 +21,7 @@ Your DSA Quiz Master app is now configured for automatic deployment to GitHub Pa
 
 3. **Update Repository Name in Vite Config**
    - Open `vite.config.ts`
-   - Change `/spark-template/` to `/your-repository-name/` in the base path
+   - The base path is already set to `/dsa-quiz-master/` for GitHub Pages
    - Or set the `GITHUB_REPOSITORY` environment variable
 
 ### Deployment Process

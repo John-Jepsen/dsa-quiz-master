@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Trophy, Medal, Crown, Share, Download, Upload, Copy } from '@phosphor-icons/react';
+import { Trophy, Medal, Crown, Share, Download, Upload, Copy } from 'lucide-react';
 import { UserProfile } from './UserAuth';
 import { toast } from 'sonner';
 
@@ -39,12 +39,12 @@ export function Leaderboard({ currentUser, onBack }: LeaderboardProps) {
       const usersWithStats: UserStats[] = users.map((user: UserProfile) => {
         const progressKey = `quiz-progress-${user.id}`;
         const topicProgress = JSON.parse(localStorage.getItem(progressKey) || '{}');
-        
+
         // Calculate overall stats
         let totalQuizzes = 0;
         let totalScore = 0;
         let completedTopics = 0;
-        
+
         Object.values(topicProgress).forEach((progress: any) => {
           if (progress.bestScore > 0) {
             totalQuizzes++;
@@ -102,12 +102,12 @@ export function Leaderboard({ currentUser, onBack }: LeaderboardProps) {
 
   const getAchievements = (user: UserStats) => {
     const achievements = [];
-    
+
     if (user.bestOverallScore >= 90) achievements.push('Quiz Master');
     if (user.bestOverallScore >= 80) achievements.push('Expert');
     if (user.totalQuizzes >= 20) achievements.push('Dedicated Learner');
     if (user.totalQuizzes >= 10) achievements.push('Quiz Enthusiast');
-    
+
     // Topic-specific achievements
     const excellentTopics = Object.values(user.topicProgress).filter(p => p.bestScore >= 80).length;
     if (excellentTopics >= 5) achievements.push('Multi-Topic Expert');
@@ -222,7 +222,7 @@ export function Leaderboard({ currentUser, onBack }: LeaderboardProps) {
                         <p className="text-muted-foreground">Complete more quizzes to earn achievements!</p>
                       )}
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4 mt-6">
                       <div className="text-center p-4 bg-muted rounded-lg">
                         <div className="text-2xl font-bold text-primary">{user.totalQuizzes}</div>
@@ -262,9 +262,9 @@ export function Leaderboard({ currentUser, onBack }: LeaderboardProps) {
                         <Download className="w-4 h-4" />
                         Download
                       </Button>
-                      <Button 
-                        onClick={() => copyToClipboard(exportData)} 
-                        variant="outline" 
+                      <Button
+                        onClick={() => copyToClipboard(exportData)}
+                        variant="outline"
                         className="flex items-center gap-2"
                       >
                         <Copy className="w-4 h-4" />

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Mail, Lock, UserPlus } from '@phosphor-icons/react';
+import { User, Mail, Lock, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface UserAuthProps {
@@ -41,14 +41,14 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
     }
 
     setIsLoading(true);
-    
+
     // Simulate login validation
     try {
       // In a real app, this would validate against a database
       // For now, we'll check if the user exists in localStorage
       const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
       const user = users.find((u: UserProfile) => u.username === loginForm.username);
-      
+
       if (!user) {
         toast.error('User not found. Please register first.');
         return;
@@ -65,7 +65,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!registerForm.username || !registerForm.email || !registerForm.displayName || !registerForm.password) {
       toast.error('Please fill in all fields');
       return;
@@ -87,7 +87,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
       // Check if username already exists
       const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
       const existingUser = users.find((u: UserProfile) => u.username === registerForm.username);
-      
+
       if (existingUser) {
         toast.error('Username already exists');
         return;
@@ -106,7 +106,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
       // Save user to localStorage
       users.push(newUser);
       localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
-      
+
       toast.success(`Account created successfully! Welcome, ${newUser.displayName}!`);
       onRegister(newUser);
     } catch (error) {
@@ -130,7 +130,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <CardHeader>
@@ -171,7 +171,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
                 </CardContent>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="register">
               <form onSubmit={handleRegister}>
                 <CardHeader>
@@ -247,7 +247,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
             </TabsContent>
           </Tabs>
         </Card>
-        
+
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
             Demo Mode: All data is stored locally and can be shared via export

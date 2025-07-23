@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Code, Clock, HardDrive } from '@phosphor-icons/react';
+import { CheckCircle, XCircle, Code, Clock, HardDrive } from 'lucide-react';
 import { QuizQuestion } from '@/lib/quiz-data';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -32,16 +32,16 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
 
   const handleSubmitAnswer = () => {
     if (selectedAnswer === null) return;
-    
+
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     if (isCorrect && !answeredQuestions[currentQuestionIndex]) {
       setScore(score + 1);
     }
-    
+
     const newAnsweredQuestions = [...answeredQuestions];
     newAnsweredQuestions[currentQuestionIndex] = true;
     setAnsweredQuestions(newAnsweredQuestions);
-    
+
     setShowExplanation(true);
   };
 
@@ -66,19 +66,19 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
 
   const getAnswerStyle = (index: number) => {
     if (!showExplanation) {
-      return selectedAnswer === index 
-        ? 'border-primary bg-primary/10' 
+      return selectedAnswer === index
+        ? 'border-primary bg-primary/10'
         : 'border-border hover:border-primary/50';
     }
-    
+
     if (index === currentQuestion.correctAnswer) {
       return 'border-success bg-success/10 text-success-foreground';
     }
-    
+
     if (index === selectedAnswer && index !== currentQuestion.correctAnswer) {
       return 'border-destructive bg-destructive/10 text-destructive-foreground';
     }
-    
+
     return 'border-border opacity-60';
   };
 
@@ -145,10 +145,10 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
                       {showExplanation && (
                         <>
                           {index === currentQuestion.correctAnswer && (
-                            <CheckCircle size={20} className="text-success" weight="fill" />
+                            <CheckCircle size={20} className="text-success" />
                           )}
                           {index === selectedAnswer && index !== currentQuestion.correctAnswer && (
-                            <XCircle size={20} className="text-destructive" weight="fill" />
+                            <XCircle size={20} className="text-destructive" />
                           )}
                         </>
                       )}
@@ -159,8 +159,8 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
               </div>
 
               {!showExplanation ? (
-                <Button 
-                  onClick={handleSubmitAnswer} 
+                <Button
+                  onClick={handleSubmitAnswer}
                   disabled={selectedAnswer === null}
                   className="w-full"
                 >
@@ -176,7 +176,7 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
                     <CardContent className="pt-6">
                       <h4 className="font-semibold mb-2">Explanation</h4>
                       <p className="text-sm leading-relaxed">{currentQuestion.explanation}</p>
-                      
+
                       {(currentQuestion.timeComplexity || currentQuestion.spaceComplexity) && (
                         <div className="flex gap-4 mt-4 pt-4 border-t">
                           {currentQuestion.timeComplexity && (
@@ -199,7 +199,7 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
                       )}
                     </CardContent>
                   </Card>
-                  
+
                   <Button onClick={handleNextQuestion} className="w-full">
                     {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
                   </Button>

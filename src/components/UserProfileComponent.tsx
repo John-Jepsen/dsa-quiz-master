@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { User, Mail, Calendar, Trophy, SignOut, Settings } from '@phosphor-icons/react';
+import { User, Mail, Calendar, Trophy, LogOut, Settings } from 'lucide-react';
 import { UserProfile } from './UserAuth';
 import { toast } from 'sonner';
 
@@ -44,7 +44,7 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
     try {
       const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
       const userIndex = users.findIndex((u: UserProfile) => u.id === user.id);
-      
+
       if (userIndex !== -1) {
         users[userIndex] = updatedUser;
         localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
@@ -67,12 +67,12 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
 
   const getAchievementBadges = () => {
     const badges = [];
-    
+
     if (user.bestOverallScore >= 90) badges.push({ text: 'Quiz Master', color: 'bg-yellow-500' });
     if (user.bestOverallScore >= 80) badges.push({ text: 'Expert', color: 'bg-blue-500' });
     if (user.totalQuizzes >= 20) badges.push({ text: 'Dedicated', color: 'bg-purple-500' });
     if (user.totalQuizzes >= 10) badges.push({ text: 'Enthusiast', color: 'bg-green-500' });
-    
+
     return badges;
   };
 
@@ -142,7 +142,7 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
                     size="sm"
                     className="flex items-center gap-2 text-destructive hover:text-destructive"
                   >
-                    <SignOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4" />
                     Logout
                   </Button>
                 </div>

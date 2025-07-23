@@ -2,15 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Trophy, Target, BookOpen, Calendar } from '@phosphor-icons/react';
+import { ArrowLeft, Trophy, Target, BookOpen, Calendar } from 'lucide-react';
 import { quizTopics } from '@/lib/quiz-data';
 import { motion } from 'framer-motion';
 
 interface ProgressTrackingProps {
   onBack: () => void;
-  userProgress: Record<string, { 
-    completed: number; 
-    total: number; 
+  userProgress: Record<string, {
+    completed: number;
+    total: number;
     bestScore: number;
     lastAttempt?: string;
   }>;
@@ -22,8 +22,8 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
     const totalQuestions = Object.values(userProgress).reduce((sum, progress) => sum + progress.total, 0);
     const completedTopics = Object.values(userProgress).filter(p => p.completed === p.total).length;
     const averageScore = Object.values(userProgress).filter(p => p.bestScore > 0);
-    const avgScore = averageScore.length > 0 
-      ? averageScore.reduce((sum, p) => sum + p.bestScore, 0) / averageScore.length 
+    const avgScore = averageScore.length > 0
+      ? averageScore.reduce((sum, p) => sum + p.bestScore, 0) / averageScore.length
       : 0;
 
     return {
@@ -144,10 +144,10 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
         <h2 className="text-2xl font-semibold mb-6">Topic Breakdown</h2>
         <div className="grid gap-4">
           {quizTopics.map((topic, index) => {
-            const progress = userProgress[topic.id] || { 
-              completed: 0, 
-              total: topic.questionCount, 
-              bestScore: 0 
+            const progress = userProgress[topic.id] || {
+              completed: 0,
+              total: topic.questionCount,
+              bestScore: 0
             };
             const completionRate = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
             const isCompleted = progress.completed === progress.total;
@@ -186,7 +186,7 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
 
                       <div className="text-right space-y-2">
                         {progress.bestScore > 0 ? (
-                          <Badge 
+                          <Badge
                             className={`${getScoreColor(progress.bestScore)} text-sm px-3 py-1`}
                             variant="outline"
                           >
@@ -197,7 +197,7 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
                             Not Started
                           </Badge>
                         )}
-                        
+
                         {progress.lastAttempt && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Calendar size={12} />
