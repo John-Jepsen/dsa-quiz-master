@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronLeft, Clock, BookOpen, Lock, CheckCircle, Play, Star } from 'lucide-react';
+import { ChevronLeft, BookOpen, Lock, CheckCircle, Play, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuizTopic, QuizModule, getModulesByTopic, isModuleUnlocked } from '@/lib/quiz-modules';
 
@@ -170,10 +170,6 @@ export function ModuleSelection({
                                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                                             <div className="flex items-center gap-4">
                                                 <span className="flex items-center gap-1">
-                                                    <Clock size={14} />
-                                                    {module.estimatedTime} min
-                                                </span>
-                                                <span className="flex items-center gap-1">
                                                     <BookOpen size={14} />
                                                     {module.questionCount} questions
                                                 </span>
@@ -192,8 +188,8 @@ export function ModuleSelection({
                                                                 key={prereqId}
                                                                 variant="outline"
                                                                 className={`text-xs ${isPrereqCompleted
-                                                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                                                        : 'bg-gray-50 text-gray-600 border-gray-200'
+                                                                    ? 'bg-green-50 text-green-700 border-green-200'
+                                                                    : 'bg-gray-50 text-gray-600 border-gray-200'
                                                                     }`}
                                                             >
                                                                 {isPrereqCompleted ? '✓' : '○'} {prereqModule.name}

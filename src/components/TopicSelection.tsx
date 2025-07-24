@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Clock } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from './UserAuth';
 import { motion } from 'framer-motion';
@@ -246,9 +246,9 @@ export function TopicSelection({
                   </div>
 
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Clock size={12} />
+                    <BookOpen size={12} />
                     <span>
-                      ~{topic.modules.reduce((sum, m) => sum + m.estimatedTime, 0)} min total
+                      {topic.modules.length} modules
                     </span>
                   </div>
 

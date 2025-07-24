@@ -3,7 +3,6 @@ export interface QuizModule {
     name: string;
     description: string;
     difficulty: 'beginner' | 'intermediate' | 'advanced';
-    estimatedTime: number; // in minutes
     questionCount: number;
     prerequisites?: string[]; // module IDs that should be completed first
     tags: string[];
@@ -46,7 +45,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Array Fundamentals',
                 description: 'Basic operations, indexing, and array properties',
                 difficulty: 'beginner',
-                estimatedTime: 5,
                 questionCount: 4,
                 tags: ['basics', 'indexing', 'operations']
             },
@@ -55,7 +53,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Array Traversal',
                 description: 'Iteration patterns and traversal techniques',
                 difficulty: 'beginner',
-                estimatedTime: 4,
                 questionCount: 3,
                 prerequisites: ['arrays-basics'],
                 tags: ['loops', 'iteration', 'patterns']
@@ -65,7 +62,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Searching in Arrays',
                 description: 'Linear search, binary search, and search optimizations',
                 difficulty: 'intermediate',
-                estimatedTime: 6,
                 questionCount: 4,
                 prerequisites: ['arrays-traversal'],
                 tags: ['search', 'binary-search', 'optimization']
@@ -75,7 +71,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Array Manipulation',
                 description: 'Insertion, deletion, and modification operations',
                 difficulty: 'intermediate',
-                estimatedTime: 7,
                 questionCount: 5,
                 prerequisites: ['arrays-basics'],
                 tags: ['insertion', 'deletion', 'modification']
@@ -85,7 +80,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Two Pointers Technique',
                 description: 'Solve array problems using two-pointer approach',
                 difficulty: 'intermediate',
-                estimatedTime: 8,
                 questionCount: 4,
                 prerequisites: ['arrays-traversal'],
                 tags: ['two-pointers', 'optimization', 'algorithms']
@@ -95,7 +89,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Advanced Array Algorithms',
                 description: 'Complex array problems and optimization techniques',
                 difficulty: 'advanced',
-                estimatedTime: 10,
                 questionCount: 4,
                 prerequisites: ['arrays-searching', 'arrays-manipulation'],
                 tags: ['algorithms', 'optimization', 'complex']
@@ -114,7 +107,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Linked List Fundamentals',
                 description: 'Nodes, pointers, and basic linked list concepts',
                 difficulty: 'beginner',
-                estimatedTime: 6,
                 questionCount: 4,
                 tags: ['basics', 'nodes', 'pointers']
             },
@@ -123,7 +115,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Singly Linked Lists',
                 description: 'Operations on singly linked lists',
                 difficulty: 'beginner',
-                estimatedTime: 7,
                 questionCount: 4,
                 prerequisites: ['linked-lists-basics'],
                 tags: ['singly', 'insertion', 'deletion']
@@ -133,7 +124,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Doubly Linked Lists',
                 description: 'Bidirectional linked lists and their advantages',
                 difficulty: 'intermediate',
-                estimatedTime: 6,
                 questionCount: 3,
                 prerequisites: ['linked-lists-singly'],
                 tags: ['doubly', 'bidirectional', 'prev-pointers']
@@ -143,7 +133,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Circular Linked Lists',
                 description: 'Circular references and cycle detection',
                 difficulty: 'intermediate',
-                estimatedTime: 8,
                 questionCount: 4,
                 prerequisites: ['linked-lists-singly'],
                 tags: ['circular', 'cycles', 'detection']
@@ -153,7 +142,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Advanced Linked List Problems',
                 description: 'Complex operations and algorithm challenges',
                 difficulty: 'advanced',
-                estimatedTime: 10,
                 questionCount: 5,
                 prerequisites: ['linked-lists-doubly', 'linked-lists-circular'],
                 tags: ['algorithms', 'merging', 'reversing']
@@ -172,7 +160,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Stack Fundamentals',
                 description: 'LIFO principle, push, pop, and peek operations',
                 difficulty: 'beginner',
-                estimatedTime: 5,
                 questionCount: 3,
                 tags: ['stack', 'LIFO', 'operations']
             },
@@ -181,7 +168,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Stack Applications',
                 description: 'Expression evaluation, parentheses matching, function calls',
                 difficulty: 'intermediate',
-                estimatedTime: 8,
                 questionCount: 4,
                 prerequisites: ['stacks-basics'],
                 tags: ['applications', 'expressions', 'parsing']
@@ -191,7 +177,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Queue Fundamentals',
                 description: 'FIFO principle, enqueue, dequeue operations',
                 difficulty: 'beginner',
-                estimatedTime: 5,
                 questionCount: 3,
                 tags: ['queue', 'FIFO', 'operations']
             },
@@ -200,7 +185,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Queue Variations',
                 description: 'Circular queues, priority queues, deques',
                 difficulty: 'intermediate',
-                estimatedTime: 9,
                 questionCount: 4,
                 prerequisites: ['queues-basics'],
                 tags: ['circular', 'priority', 'deque']
@@ -210,7 +194,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Advanced Stack & Queue Problems',
                 description: 'Complex algorithms using stacks and queues',
                 difficulty: 'advanced',
-                estimatedTime: 12,
                 questionCount: 4,
                 prerequisites: ['stacks-applications', 'queues-types'],
                 tags: ['algorithms', 'complex', 'optimization']
@@ -229,7 +212,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Tree Fundamentals',
                 description: 'Tree terminology, nodes, edges, and basic concepts',
                 difficulty: 'beginner',
-                estimatedTime: 6,
                 questionCount: 4,
                 tags: ['basics', 'terminology', 'concepts']
             },
@@ -238,7 +220,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Binary Trees',
                 description: 'Binary tree properties and basic operations',
                 difficulty: 'beginner',
-                estimatedTime: 7,
                 questionCount: 4,
                 prerequisites: ['trees-basics'],
                 tags: ['binary', 'properties', 'operations']
@@ -248,7 +229,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Tree Traversals',
                 description: 'Inorder, preorder, postorder, and level-order traversals',
                 difficulty: 'intermediate',
-                estimatedTime: 9,
                 questionCount: 5,
                 prerequisites: ['binary-trees'],
                 tags: ['traversal', 'inorder', 'preorder', 'postorder']
@@ -258,7 +238,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Binary Search Trees',
                 description: 'BST properties, search, insertion, and deletion',
                 difficulty: 'intermediate',
-                estimatedTime: 10,
                 questionCount: 5,
                 prerequisites: ['tree-traversals'],
                 tags: ['BST', 'search', 'insertion', 'deletion']
@@ -268,7 +247,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Balanced Trees',
                 description: 'AVL trees, red-black trees, and balancing concepts',
                 difficulty: 'advanced',
-                estimatedTime: 12,
                 questionCount: 5,
                 prerequisites: ['binary-search-trees'],
                 tags: ['AVL', 'red-black', 'balancing']
@@ -278,7 +256,6 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 name: 'Advanced Tree Algorithms',
                 description: 'Complex tree problems and optimization techniques',
                 difficulty: 'advanced',
-                estimatedTime: 15,
                 questionCount: 5,
                 prerequisites: ['balanced-trees'],
                 tags: ['algorithms', 'optimization', 'complex']
