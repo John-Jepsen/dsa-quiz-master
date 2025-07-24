@@ -2,30 +2,25 @@ import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
+import { ModuleSelection } from '@/components/ModuleSelection';
 import { Quiz } from '@/components/Quiz';
 import { QuizResults } from '@/components/QuizResults';
 import { ProgressTracking } from '@/components/ProgressTracking';
 import { Leaderboard } from '@/components/Leaderboard';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
-import { quizTopics, getQuestionsByTopic, getRandomQuestions, QuizQuestion } from '@/lib/quiz-data';
+import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
+import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
+import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'auth' | 'topic-selection' | 'quiz' | 'results' | 'progress' | 'leaderboard' | 'profile';
-
-interface UserProgress {
-  [topicId: string]: {
-    completed: number;
-    total: number;
-    bestScore: number;
-    lastAttempt?: string;
-  };
-}
+type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'leaderboard' | 'profile';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('auth');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
+  const [currentModule, setCurrentModule] = useState<QuizModule | null>(null);
   const [currentTopic, setCurrentTopic] = useState<string>('');
   const [quizScore, setQuizScore] = useState(0);
 
@@ -43,32 +38,12 @@ function App() {
     }
   }, []);
 
-  // Use user-specific progress key
-  const progressKey = currentUser ? `quiz-progress-${currentUser.id}` : 'quiz-progress';
-  const [userProgress, setUserProgress] = useLocalStorage<UserProgress>(progressKey, {});
+  // Use user-specific progress keys
+  const completedModulesKey = currentUser ? `completed-modules-${currentUser.id}` : 'completed-modules';
+  const moduleScoresKey = currentUser ? `module-scores-${currentUser.id}` : 'module-scores';
 
-  // Initialize progress for all topics when user changes
-  useEffect(() => {
-    if (!currentUser) return;
-
-    setUserProgress((currentProgress) => {
-      const updatedProgress = { ...currentProgress };
-      let hasChanges = false;
-
-      quizTopics.forEach(topic => {
-        if (!updatedProgress[topic.id]) {
-          updatedProgress[topic.id] = {
-            completed: 0,
-            total: topic.questionCount,
-            bestScore: 0
-          };
-          hasChanges = true;
-        }
-      });
-
-      return hasChanges ? updatedProgress : currentProgress;
-    });
-  }, [currentUser, setUserProgress]);
+  const [completedModules, setCompletedModules] = useLocalStorage<string[]>(completedModulesKey, []);
+  const [moduleScores, setModuleScores] = useLocalStorage<Record<string, number>>(moduleScoresKey, {});
 
   const handleLogin = (user: UserProfile) => {
     setCurrentUser(user);
@@ -96,75 +71,73 @@ function App() {
   };
 
   const handleTopicSelect = (topicId: string) => {
-    let questions: QuizQuestion[];
-    let topicName: string;
-
     if (topicId === 'random') {
-      questions = getRandomQuestions(10);
-      topicName = 'Mixed Topics';
+      // For random quiz, get questions from multiple modules
+      const allQuestions = quizQuestions.slice(0, 10); // Get first 10 questions as random sample
+      setCurrentQuestions(allQuestions);
+      setCurrentTopic('random');
+      setCurrentModule(null);
+      setAppState('quiz');
     } else {
-      questions = getQuestionsByTopic(topicId);
-      const topic = quizTopics.find(t => t.id === topicId);
-      topicName = topic?.name || 'Unknown Topic';
+      setCurrentTopic(topicId);
+      setAppState('module-selection');
     }
+  };
 
-    if (questions.length === 0) {
-      toast.error('No questions available for this topic');
+  const handleModuleSelect = (moduleId: string) => {
+    const module = getModuleById(moduleId);
+    if (!module) {
+      toast.error('Module not found');
       return;
     }
 
-    setCurrentQuestions(questions);
-    setCurrentTopic(topicId);
+    // Get questions for this specific module
+    const moduleQuestions = getQuestionsByModule(moduleId);
+    if (moduleQuestions.length === 0) {
+      toast.error('No questions available for this module yet');
+      return;
+    }
+
+    setCurrentModule(module);
+    setCurrentQuestions(moduleQuestions);
     setAppState('quiz');
   };
 
   const handleQuizComplete = (score: number, totalQuestions: number) => {
     setQuizScore(score);
 
-    // Update progress
-    if (currentTopic !== 'random' && currentUser) {
-      setUserProgress((currentProgress) => {
-        const updatedProgress = { ...currentProgress };
-        const topicProgress = updatedProgress[currentTopic] || {
-          completed: 0,
-          total: totalQuestions,
-          bestScore: 0
-        };
+    if (currentModule && currentUser) {
+      const scorePercentage = Math.round((score / totalQuestions) * 100);
 
-        const newScore = Math.round((score / totalQuestions) * 100);
-        const questionsAnswered = Math.max(topicProgress.completed, score);
+      // Update module completion and score
+      if (!completedModules.includes(currentModule.id)) {
+        setCompletedModules(prev => [...prev, currentModule.id]);
+      }
 
-        updatedProgress[currentTopic] = {
-          ...topicProgress,
-          completed: questionsAnswered,
-          bestScore: Math.max(topicProgress.bestScore, newScore),
-          lastAttempt: new Date().toISOString()
-        };
-
-        return updatedProgress;
-      });
+      // Update best score for this module
+      setModuleScores(prev => ({
+        ...prev,
+        [currentModule.id]: Math.max(prev[currentModule.id] || 0, scorePercentage)
+      }));
 
       // Update user's overall stats
       const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
       const userIndex = users.findIndex((u: UserProfile) => u.id === currentUser.id);
 
       if (userIndex !== -1) {
-        const currentBest = userProgress[currentTopic]?.bestScore || 0;
-        const newScore = Math.round((score / totalQuestions) * 100);
-
         users[userIndex].totalQuizzes += 1;
-
-        // Update best overall score (average of all topic best scores)
-        const allScores = Object.values(userProgress).map(p => p.bestScore).filter(s => s > 0);
-        allScores.push(newScore);
-        users[userIndex].bestOverallScore = Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
-
+        const allScores = Object.values(moduleScores);
+        const currentBest = allScores.length > 0 ? Math.max(...allScores, scorePercentage) : scorePercentage;
+        users[userIndex].bestOverallScore = Math.max(users[userIndex].bestOverallScore, currentBest);
         localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
-        setCurrentUser(users[userIndex]);
+
+        const updatedUser = users[userIndex];
+        setCurrentUser(updatedUser);
+        localStorage.setItem('dsa-quiz-current-user', JSON.stringify(updatedUser));
 
         // Show achievement toast for new best score
-        if (newScore > currentBest && newScore >= 80) {
-          toast.success(`New best score: ${newScore}%! 🎉`);
+        if (scorePercentage >= 80) {
+          toast.success(`Great score: ${scorePercentage}%! 🎉`);
         }
       }
     }
@@ -173,13 +146,24 @@ function App() {
   };
 
   const handleRetakeQuiz = () => {
-    handleTopicSelect(currentTopic);
+    if (currentModule) {
+      handleModuleSelect(currentModule.id);
+    } else {
+      handleTopicSelect(currentTopic);
+    }
   };
 
   const handleBackToTopics = () => {
     setAppState('topic-selection');
     setCurrentQuestions([]);
     setCurrentTopic('');
+    setCurrentModule(null);
+  };
+
+  const handleBackToModules = () => {
+    setAppState('module-selection');
+    setCurrentQuestions([]);
+    setCurrentModule(null);
   };
 
   const handleViewProgress = () => {
@@ -196,13 +180,15 @@ function App() {
 
   const getCurrentTopicName = () => {
     if (currentTopic === 'random') return 'Mixed Topics';
-    const topic = quizTopics.find(t => t.id === currentTopic);
+    const topic = enhancedQuizTopics.find(t => t.id === currentTopic);
     return topic?.name || 'Unknown Topic';
   };
 
   const getPreviousBestScore = () => {
-    if (currentTopic === 'random') return 0;
-    return userProgress[currentTopic]?.bestScore || 0;
+    if (currentModule) {
+      return moduleScores[currentModule.id] || 0;
+    }
+    return 0;
   };
 
   return (
@@ -216,13 +202,23 @@ function App() {
 
       {appState === 'topic-selection' && currentUser && (
         <TopicSelection
-          topics={quizTopics}
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
           onViewLeaderboard={handleViewLeaderboard}
           onViewProfile={handleViewProfile}
-          userProgress={userProgress}
           currentUser={currentUser}
+          completedModules={completedModules}
+          moduleScores={moduleScores}
+        />
+      )}
+
+      {appState === 'module-selection' && currentUser && (
+        <ModuleSelection
+          topic={enhancedQuizTopics.find(t => t.id === currentTopic)!}
+          onModuleSelect={handleModuleSelect}
+          onBack={handleBackToTopics}
+          completedModules={completedModules}
+          moduleScores={moduleScores}
         />
       )}
 
@@ -230,7 +226,7 @@ function App() {
         <Quiz
           questions={currentQuestions}
           onComplete={handleQuizComplete}
-          onExit={handleBackToTopics}
+          onExit={currentModule ? handleBackToModules : handleBackToTopics}
         />
       )}
 
@@ -238,9 +234,9 @@ function App() {
         <QuizResults
           score={quizScore}
           totalQuestions={currentQuestions.length}
-          topicName={getCurrentTopicName()}
+          topicName={currentModule ? currentModule.name : getCurrentTopicName()}
           onRetakeQuiz={handleRetakeQuiz}
-          onBackToTopics={handleBackToTopics}
+          onBackToTopics={currentModule ? handleBackToModules : handleBackToTopics}
           previousBestScore={getPreviousBestScore()}
         />
       )}
@@ -248,7 +244,7 @@ function App() {
       {appState === 'progress' && (
         <ProgressTracking
           onBack={handleBackToTopics}
-          userProgress={userProgress}
+          userProgress={{}} // TODO: Adapt this component for new module system
         />
       )}
 

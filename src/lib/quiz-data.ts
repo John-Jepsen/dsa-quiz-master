@@ -1,6 +1,7 @@
 export interface QuizQuestion {
   id: string;
   topic: string;
+  moduleId?: string; // Add moduleId for the new system
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   question: string;
   code?: string;
@@ -69,6 +70,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'arr-1',
     topic: 'arrays',
+    moduleId: 'arrays-basics',
     difficulty: 'beginner',
     question: 'What is the time complexity of accessing an element in an array by index?',
     options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
@@ -80,6 +82,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'arr-2',
     topic: 'arrays',
+    moduleId: 'arrays-manipulation',
     difficulty: 'intermediate',
     question: 'Which operation has the worst time complexity in a dynamic array (like Python list or JavaScript array)?',
     options: ['Append to end', 'Insert at beginning', 'Access by index', 'Pop from end'],
@@ -91,6 +94,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'arr-3',
     topic: 'arrays',
+    moduleId: 'arrays-manipulation',
     difficulty: 'intermediate',
     question: 'What happens when a dynamic array needs to resize during an append operation?',
     options: [
@@ -168,7 +172,7 @@ export const quizQuestions: QuizQuestion[] = [
     question: 'What is the main advantage of a linked list over an array?',
     options: [
       'Faster random access',
-      'Better cache performance', 
+      'Better cache performance',
       'Dynamic size without reallocation',
       'Less memory usage'
     ],
@@ -301,7 +305,7 @@ export const quizQuestions: QuizQuestion[] = [
     ],
     correctAnswer: 0,
     explanation: 'You can implement a queue using two stacks: one for enqueue operations (push elements), and when dequeue is needed, transfer all elements to the second stack (reversing order), then pop from it.',
-    timeComplexity: 'O(1) amortized for both operations',  
+    timeComplexity: 'O(1) amortized for both operations',
     spaceComplexity: 'O(n)'
   },
   {
@@ -320,7 +324,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'tree-1',
     topic: 'trees',
-    difficulty: 'beginner',  
+    difficulty: 'beginner',
     question: 'In a binary tree, what is the maximum number of children a node can have?',
     options: ['1', '2', '3', 'Unlimited'],
     correctAnswer: 1,

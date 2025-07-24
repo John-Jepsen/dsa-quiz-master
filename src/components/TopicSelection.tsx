@@ -3,29 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User } from 'lucide-react';
-import { QuizTopic, getQuestionsByTopic } from '@/lib/quiz-data';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Clock } from 'lucide-react';
+import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from './UserAuth';
 import { motion } from 'framer-motion';
 
 interface TopicSelectionProps {
-  topics: QuizTopic[];
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
   onViewLeaderboard: () => void;
   onViewProfile: () => void;
-  userProgress: Record<string, { completed: number; total: number; bestScore: number }>;
   currentUser: UserProfile;
+  completedModules: string[]; // Array of completed module IDs
+  moduleScores: Record<string, number>; // moduleId -> best score
 }
 
 export function TopicSelection({
-  topics,
   onTopicSelect,
   onViewProgress,
   onViewLeaderboard,
   onViewProfile,
-  userProgress,
-  currentUser
+  currentUser,
+  completedModules,
+  moduleScores
 }: TopicSelectionProps) {
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -40,15 +40,36 @@ export function TopicSelection({
   };
 
   const getTotalProgress = () => {
-    const totalCompleted = Object.values(userProgress).reduce((sum, progress) => sum + progress.completed, 0);
-    const totalQuestions = Object.values(userProgress).reduce((sum, progress) => sum + progress.total, 0);
-    return totalQuestions > 0 ? (totalCompleted / totalQuestions) * 100 : 0;
+    const allTopics = enhancedQuizTopics;
+    let totalCompleted = 0;
+    let totalModules = 0;
+
+    allTopics.forEach(topic => {
+      const progress = getTopicProgress(topic.id, completedModules);
+      totalCompleted += progress.completed;
+      totalModules += progress.total;
+    });
+
+    return totalModules > 0 ? (totalCompleted / totalModules) * 100 : 0;
   };
 
   const getOverallScore = () => {
-    const scores = Object.values(userProgress).filter(p => p.bestScore > 0);
+    const scores = Object.values(moduleScores).filter(score => score > 0);
     if (scores.length === 0) return 0;
-    return scores.reduce((sum, p) => sum + p.bestScore, 0) / scores.length;
+    return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+  };
+
+  const getTotalQuestions = () => {
+    return enhancedQuizTopics.reduce((sum, topic) => sum + topic.totalQuestions, 0);
+  };
+
+  const getCompletedQuestions = () => {
+    return enhancedQuizTopics.reduce((sum, topic) => {
+      const completedInTopic = topic.modules
+        .filter(module => completedModules.includes(module.id))
+        .reduce((moduleSum, module) => moduleSum + module.questionCount, 0);
+      return sum + completedInTopic;
+    }, 0);
   };
 
   const getInitials = (name: string) => {
@@ -127,7 +148,7 @@ export function TopicSelection({
                 <BookOpen size={24} className="text-primary" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{topics.length}</div>
+                <div className="text-2xl font-bold">{enhancedQuizTopics.length}</div>
                 <div className="text-sm text-muted-foreground">Topics Available</div>
               </div>
             </div>
@@ -168,9 +189,15 @@ export function TopicSelection({
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {topics.map((topic, index) => {
-          const progress = userProgress[topic.id] || { completed: 0, total: topic.questionCount, bestScore: 0 };
-          const completionRate = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0;
+        {enhancedQuizTopics.map((topic, index) => {
+          const progress = getTopicProgress(topic.id, completedModules);
+          const completionRate = progress.percentage;
+          const topicScores = topic.modules
+            .map(module => moduleScores[module.id])
+            .filter(score => score !== undefined && score > 0);
+          const avgScore = topicScores.length > 0
+            ? topicScores.reduce((sum, score) => sum + score, 0) / topicScores.length
+            : 0;
 
           return (
             <motion.div
@@ -190,11 +217,14 @@ export function TopicSelection({
                         <CardTitle className="text-lg">{topic.name}</CardTitle>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">
-                            {topic.questionCount} questions
+                            {topic.modules.length} modules
                           </Badge>
-                          {progress.bestScore > 0 && (
+                          <Badge variant="outline" className="text-xs">
+                            {topic.totalQuestions} questions
+                          </Badge>
+                          {avgScore > 0 && (
                             <Badge className="text-xs bg-success/10 text-success">
-                              Best: {progress.bestScore}%
+                              Avg: {avgScore.toFixed(0)}%
                             </Badge>
                           )}
                         </div>
@@ -210,9 +240,16 @@ export function TopicSelection({
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Progress</span>
-                      <span>{progress.completed}/{progress.total}</span>
+                      <span>{progress.completed}/{progress.total} modules</span>
                     </div>
                     <Progress value={completionRate} className="h-2" />
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock size={12} />
+                    <span>
+                      ~{topic.modules.reduce((sum, m) => sum + m.estimatedTime, 0)} min total
+                    </span>
                   </div>
 
                   <Button
@@ -220,7 +257,7 @@ export function TopicSelection({
                     className="w-full"
                     variant={completionRate === 100 ? "outline" : "default"}
                   >
-                    {completionRate === 100 ? 'Review Topic' : 'Start Quiz'}
+                    {completionRate === 100 ? 'Review Modules' : progress.completed > 0 ? 'Continue Learning' : 'Start Learning'}
                   </Button>
                 </CardContent>
               </Card>
