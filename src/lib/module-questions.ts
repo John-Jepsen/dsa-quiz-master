@@ -547,6 +547,769 @@ export const moduleQuestions = [
         spaceComplexity: 'O(1)'
     },
 
+    // Linked Lists Doubly Module
+    {
+        id: 'll-doubly-1',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-doubly',
+        difficulty: 'intermediate' as const,
+        question: 'What is the main advantage of doubly linked lists over singly linked lists?',
+        options: [
+            'They use less memory',
+            'They can be traversed in both directions',
+            'They have faster insertion',
+            'They are easier to implement'
+        ],
+        correctAnswer: 1,
+        explanation: 'Doubly linked lists can be traversed in both directions because each node has pointers to both the next and previous nodes.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-doubly-2',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-doubly',
+        difficulty: 'intermediate' as const,
+        question: 'What is the space overhead per node in a doubly linked list compared to a singly linked list?',
+        options: [
+            'Same space',
+            'One additional pointer',
+            'Two additional pointers',
+            'Depends on the data type'
+        ],
+        correctAnswer: 1,
+        explanation: 'Each node in a doubly linked list needs one additional pointer (to the previous node) compared to a singly linked list.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-doubly-3',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-doubly',
+        difficulty: 'intermediate' as const,
+        question: 'In a doubly linked list, what should the prev pointer of the first node point to?',
+        options: ['The last node', 'NULL/None', 'Itself', 'The second node'],
+        correctAnswer: 1,
+        explanation: 'The prev pointer of the first node should point to NULL/None to indicate it has no predecessor.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Linked Lists Circular Module
+    {
+        id: 'll-circular-1',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-circular',
+        difficulty: 'intermediate' as const,
+        question: 'What distinguishes a circular linked list from a regular linked list?',
+        options: [
+            'It has no head node',
+            'The last node points to the first node',
+            'It can only be traversed backwards',
+            'It uses doubly linked nodes'
+        ],
+        correctAnswer: 1,
+        explanation: 'In a circular linked list, the last node\'s next pointer points back to the first node, forming a circle.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-circular-2',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-circular',
+        difficulty: 'intermediate' as const,
+        question: 'How do you detect if a linked list has a cycle?',
+        options: [
+            'Count all nodes',
+            'Use Floyd\'s cycle detection algorithm',
+            'Check if head is null',
+            'Compare all node values'
+        ],
+        correctAnswer: 1,
+        explanation: 'Floyd\'s cycle detection algorithm (tortoise and hare) uses two pointers moving at different speeds to detect cycles.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-circular-3',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-circular',
+        difficulty: 'intermediate' as const,
+        question: 'What is the termination condition when traversing a circular linked list?',
+        options: [
+            'When next pointer is NULL',
+            'When we reach the starting node again',
+            'When we count all nodes',
+            'When we find a duplicate value'
+        ],
+        correctAnswer: 1,
+        explanation: 'In a circular linked list, traversal terminates when we reach the starting node again, not when we find a NULL pointer.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-circular-4',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-circular',
+        difficulty: 'intermediate' as const,
+        question: 'What is a potential issue with circular linked lists?',
+        options: [
+            'They use more memory',
+            'Infinite loops if not handled properly',
+            'They cannot store data',
+            'They are slower than regular lists'
+        ],
+        correctAnswer: 1,
+        explanation: 'Circular linked lists can cause infinite loops if traversal logic doesn\'t properly handle the circular nature.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Linked Lists Advanced Module
+    {
+        id: 'll-adv-1',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-advanced',
+        difficulty: 'advanced' as const,
+        question: 'How do you reverse a linked list iteratively?',
+        options: [
+            'Use a stack to store all nodes',
+            'Use three pointers: prev, current, next',
+            'Create a new list with reversed order',
+            'Use recursion only'
+        ],
+        correctAnswer: 1,
+        explanation: 'Iterative reversal uses three pointers to reverse the direction of links while traversing the list once.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-adv-2',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-advanced',
+        difficulty: 'advanced' as const,
+        question: 'What is the time complexity of merging two sorted linked lists?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+        correctAnswer: 2,
+        explanation: 'Merging two sorted linked lists requires traversing both lists once, giving O(n + m) or O(n) time complexity.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-adv-3',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-advanced',
+        difficulty: 'advanced' as const,
+        question: 'How do you find the middle node of a linked list in one pass?',
+        options: [
+            'Count nodes first, then traverse to middle',
+            'Use two pointers: slow and fast',
+            'Use a hash table',
+            'Convert to array first'
+        ],
+        correctAnswer: 1,
+        explanation: 'Use two pointers: slow moves one step, fast moves two steps. When fast reaches the end, slow is at the middle.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'll-adv-4',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-advanced',
+        difficulty: 'advanced' as const,
+        question: 'What is the space complexity of recursive linked list reversal?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+        correctAnswer: 2,
+        explanation: 'Recursive reversal uses O(n) space due to the call stack, where n is the number of nodes.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'll-adv-5',
+        topic: 'linked-lists',
+        moduleId: 'linked-lists-advanced',
+        difficulty: 'advanced' as const,
+        question: 'How do you remove the nth node from the end of a linked list in one pass?',
+        options: [
+            'Count nodes first, then remove',
+            'Use two pointers with n gap between them',
+            'Use a stack',
+            'Reverse the list first'
+        ],
+        correctAnswer: 1,
+        explanation: 'Use two pointers: advance the first pointer n steps, then move both until the first reaches the end.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Stack Applications Module
+    {
+        id: 'stack-app-1',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-applications',
+        difficulty: 'intermediate' as const,
+        question: 'Which of the following is NOT a typical application of stacks?',
+        options: [
+            'Function call management',
+            'Expression evaluation',
+            'Breadth-first search',
+            'Parentheses matching'
+        ],
+        correctAnswer: 2,
+        explanation: 'Breadth-first search uses a queue, not a stack. BFS explores nodes level by level, which requires FIFO behavior.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'stack-app-2',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-applications',
+        difficulty: 'intermediate' as const,
+        question: 'In expression evaluation, what is the purpose of an operator stack?',
+        options: [
+            'Store operands',
+            'Store operators with their precedence',
+            'Store the final result',
+            'Count the number of operations'
+        ],
+        correctAnswer: 1,
+        explanation: 'The operator stack stores operators based on their precedence, ensuring correct order of operations.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'stack-app-3',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-applications',
+        difficulty: 'intermediate' as const,
+        question: 'What happens when a function is called in terms of stack operations?',
+        options: [
+            'Nothing happens to the stack',
+            'The function\'s context is pushed onto the call stack',
+            'The function\'s context is popped from the stack',
+            'The stack is cleared'
+        ],
+        correctAnswer: 1,
+        explanation: 'When a function is called, its execution context (variables, return address) is pushed onto the call stack.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'stack-app-4',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-applications',
+        difficulty: 'intermediate' as const,
+        question: 'How do you check for balanced parentheses using a stack?',
+        options: [
+            'Push all characters onto the stack',
+            'Push opening brackets, pop and match with closing brackets',
+            'Count opening and closing brackets',
+            'Use two stacks'
+        ],
+        correctAnswer: 1,
+        explanation: 'Push opening brackets onto the stack. For each closing bracket, pop and check if it matches the corresponding opening bracket.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+
+    // Queue Variations Module
+    {
+        id: 'queue-var-1',
+        topic: 'stacks-queues',
+        moduleId: 'queues-types',
+        difficulty: 'intermediate' as const,
+        question: 'What is a circular queue?',
+        options: [
+            'A queue that can only store circular objects',
+            'A queue where the rear connects to the front',
+            'A queue with no size limit',
+            'A queue that operates in reverse'
+        ],
+        correctAnswer: 1,
+        explanation: 'A circular queue treats the storage as circular, where the rear position wraps around to the front when space is available.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'queue-var-2',
+        topic: 'stacks-queues',
+        moduleId: 'queues-types',
+        difficulty: 'intermediate' as const,
+        question: 'What is the main advantage of a priority queue?',
+        options: [
+            'Faster insertion',
+            'Elements are served based on priority, not arrival time',
+            'Uses less memory',
+            'Simpler implementation'
+        ],
+        correctAnswer: 1,
+        explanation: 'Priority queues serve elements based on their priority level rather than their arrival time (FIFO).',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'queue-var-3',
+        topic: 'stacks-queues',
+        moduleId: 'queues-types',
+        difficulty: 'intermediate' as const,
+        question: 'What is a deque (double-ended queue)?',
+        options: [
+            'A queue with two separate storage areas',
+            'A queue that allows insertion and deletion at both ends',
+            'A queue that stores only pairs of elements',
+            'A queue with duplicate elements'
+        ],
+        correctAnswer: 1,
+        explanation: 'A deque allows insertion and deletion operations at both the front and rear ends.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'queue-var-4',
+        topic: 'stacks-queues',
+        moduleId: 'queues-types',
+        difficulty: 'intermediate' as const,
+        question: 'Which data structure is commonly used to implement a priority queue?',
+        options: ['Array', 'Linked List', 'Heap', 'Stack'],
+        correctAnswer: 2,
+        explanation: 'Heaps are commonly used to implement priority queues because they provide efficient insertion and extraction of the highest/lowest priority element.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Advanced Stack & Queue Problems Module
+    {
+        id: 'sq-adv-1',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-queues-advanced',
+        difficulty: 'advanced' as const,
+        question: 'How do you implement a queue using two stacks?',
+        options: [
+            'Use one stack for enqueue and dequeue',
+            'Use one stack for enqueue, transfer to second stack for dequeue',
+            'Use both stacks for enqueue only',
+            'It\'s impossible'
+        ],
+        correctAnswer: 1,
+        explanation: 'Use one stack for enqueue. For dequeue, if the second stack is empty, transfer all elements from first to second stack, then pop from second.',
+        timeComplexity: 'O(1) amortized',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'sq-adv-2',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-queues-advanced',
+        difficulty: 'advanced' as const,
+        question: 'What is the time complexity of the "next greater element" problem using a stack?',
+        options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(1)'],
+        correctAnswer: 2,
+        explanation: 'Using a stack to find the next greater element for all elements takes O(n) time as each element is pushed and popped at most once.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'sq-adv-3',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-queues-advanced',
+        difficulty: 'advanced' as const,
+        question: 'How do you find the largest rectangular area in a histogram using a stack?',
+        options: [
+            'Use two nested loops',
+            'Use a stack to track indices of bars in increasing height order',
+            'Sort the histogram first',
+            'Use dynamic programming'
+        ],
+        correctAnswer: 1,
+        explanation: 'Use a stack to maintain indices of bars in increasing height order. When a smaller bar is found, calculate area using the stack.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'sq-adv-4',
+        topic: 'stacks-queues',
+        moduleId: 'stacks-queues-advanced',
+        difficulty: 'advanced' as const,
+        question: 'What is the sliding window maximum problem and which data structure solves it efficiently?',
+        options: [
+            'Find minimum in fixed-size window, use stack',
+            'Find maximum in fixed-size sliding window, use deque',
+            'Find average in window, use queue',
+            'Find median in window, use heap'
+        ],
+        correctAnswer: 1,
+        explanation: 'Sliding window maximum finds the maximum element in each window of size k. A deque efficiently maintains maximum candidates.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(k)'
+    },
+
+    // Binary Trees Module
+    {
+        id: 'bt-1',
+        topic: 'trees',
+        moduleId: 'binary-trees',
+        difficulty: 'beginner' as const,
+        question: 'What is the maximum number of nodes at level h in a binary tree?',
+        options: ['h', '2^h', '2^(h-1)', '2^(h+1)'],
+        correctAnswer: 1,
+        explanation: 'At level h, a binary tree can have at most 2^h nodes (considering root as level 0).',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bt-2',
+        topic: 'trees',
+        moduleId: 'binary-trees',
+        difficulty: 'beginner' as const,
+        question: 'What is a complete binary tree?',
+        options: [
+            'A tree where all levels are completely filled',
+            'A tree where all levels are filled except possibly the last, which is filled left to right',
+            'A tree with exactly two children for each node',
+            'A tree with equal height on both sides'
+        ],
+        correctAnswer: 1,
+        explanation: 'A complete binary tree has all levels filled except possibly the last level, which is filled from left to right.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bt-3',
+        topic: 'trees',
+        moduleId: 'binary-trees',
+        difficulty: 'beginner' as const,
+        question: 'What is a full binary tree?',
+        options: [
+            'A tree that is completely filled',
+            'A tree where every node has either 0 or 2 children',
+            'A tree with maximum possible nodes',
+            'A tree where all leaves are at the same level'
+        ],
+        correctAnswer: 1,
+        explanation: 'A full binary tree is one where every node has either 0 children (leaf) or exactly 2 children.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bt-4',
+        topic: 'trees',
+        moduleId: 'binary-trees',
+        difficulty: 'beginner' as const,
+        question: 'What is the height of a binary tree with n nodes in the worst case?',
+        options: ['log n', 'n', 'n-1', '2n'],
+        correctAnswer: 2,
+        explanation: 'In the worst case (skewed tree), the height is n-1, where each node has only one child.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Tree Traversals Module
+    {
+        id: 'tt-1',
+        topic: 'trees',
+        moduleId: 'tree-traversals',
+        difficulty: 'intermediate' as const,
+        question: 'In which order does pre-order traversal visit nodes?',
+        options: [
+            'Left, Root, Right',
+            'Root, Left, Right',
+            'Left, Right, Root',
+            'Right, Root, Left'
+        ],
+        correctAnswer: 1,
+        explanation: 'Pre-order traversal visits nodes in the order: Root, Left subtree, Right subtree.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(h)'
+    },
+    {
+        id: 'tt-2',
+        topic: 'trees',
+        moduleId: 'tree-traversals',
+        difficulty: 'intermediate' as const,
+        question: 'What traversal gives you the sorted order in a Binary Search Tree?',
+        options: ['Pre-order', 'In-order', 'Post-order', 'Level-order'],
+        correctAnswer: 1,
+        explanation: 'In-order traversal of a BST gives nodes in sorted ascending order.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(h)'
+    },
+    {
+        id: 'tt-3',
+        topic: 'trees',
+        moduleId: 'tree-traversals',
+        difficulty: 'intermediate' as const,
+        question: 'Which traversal is used to delete nodes safely in a tree?',
+        options: ['Pre-order', 'In-order', 'Post-order', 'Level-order'],
+        correctAnswer: 2,
+        explanation: 'Post-order traversal processes children before the parent, making it safe for deletion operations.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(h)'
+    },
+    {
+        id: 'tt-4',
+        topic: 'trees',
+        moduleId: 'tree-traversals',
+        difficulty: 'intermediate' as const,
+        question: 'What data structure is used for level-order traversal?',
+        options: ['Stack', 'Queue', 'Array', 'Linked List'],
+        correctAnswer: 1,
+        explanation: 'Level-order traversal uses a queue to process nodes level by level in FIFO order.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(w)'
+    },
+    {
+        id: 'tt-5',
+        topic: 'trees',
+        moduleId: 'tree-traversals',
+        difficulty: 'intermediate' as const,
+        question: 'What is the space complexity of recursive tree traversal?',
+        options: ['O(1)', 'O(log n)', 'O(h)', 'O(n)'],
+        correctAnswer: 2,
+        explanation: 'Recursive traversal uses O(h) space where h is the height of the tree due to the call stack.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(h)'
+    },
+
+    // Binary Search Trees Module
+    {
+        id: 'bst-1',
+        topic: 'trees',
+        moduleId: 'binary-search-trees',
+        difficulty: 'intermediate' as const,
+        question: 'What is the key property of a Binary Search Tree?',
+        options: [
+            'All nodes have two children',
+            'Left child < Parent < Right child',
+            'All leaves are at the same level',
+            'The tree is always balanced'
+        ],
+        correctAnswer: 1,
+        explanation: 'In a BST, for every node, all values in the left subtree are less than the node, and all values in the right subtree are greater.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bst-2',
+        topic: 'trees',
+        moduleId: 'binary-search-trees',
+        difficulty: 'intermediate' as const,
+        question: 'What is the average time complexity of search in a BST?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'],
+        correctAnswer: 1,
+        explanation: 'In a balanced BST, search takes O(log n) time on average as we eliminate half the tree at each step.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bst-3',
+        topic: 'trees',
+        moduleId: 'binary-search-trees',
+        difficulty: 'intermediate' as const,
+        question: 'What happens when you insert duplicate values in a BST?',
+        options: [
+            'The tree becomes invalid',
+            'Depends on implementation (left or right subtree)',
+            'Always goes to the left',
+            'Always goes to the right'
+        ],
+        correctAnswer: 1,
+        explanation: 'BST implementations handle duplicates differently - some allow them in left or right subtree, others may not allow duplicates.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bst-4',
+        topic: 'trees',
+        moduleId: 'binary-search-trees',
+        difficulty: 'intermediate' as const,
+        question: 'What is the worst-case time complexity of operations in a BST?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+        correctAnswer: 2,
+        explanation: 'In the worst case (skewed tree), BST operations degrade to O(n) as the tree becomes like a linked list.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'bst-5',
+        topic: 'trees',
+        moduleId: 'binary-search-trees',
+        difficulty: 'intermediate' as const,
+        question: 'How do you delete a node with two children in a BST?',
+        options: [
+            'Replace with any leaf node',
+            'Replace with inorder predecessor or successor',
+            'Remove both children',
+            'Mark the node as deleted'
+        ],
+        correctAnswer: 1,
+        explanation: 'To delete a node with two children, replace it with its inorder predecessor or successor to maintain BST property.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Balanced Trees Module
+    {
+        id: 'bal-1',
+        topic: 'trees',
+        moduleId: 'balanced-trees',
+        difficulty: 'advanced' as const,
+        question: 'What is the balance factor in an AVL tree?',
+        options: [
+            'Number of nodes in left vs right subtree',
+            'Height difference between left and right subtrees',
+            'Depth of the deepest node',
+            'Number of rotations needed'
+        ],
+        correctAnswer: 1,
+        explanation: 'The balance factor is the height difference between left and right subtrees. In AVL trees, it must be -1, 0, or 1.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bal-2',
+        topic: 'trees',
+        moduleId: 'balanced-trees',
+        difficulty: 'advanced' as const,
+        question: 'What triggers a rotation in an AVL tree?',
+        options: [
+            'Any insertion',
+            'When balance factor becomes ±2',
+            'When tree height increases',
+            'After every deletion'
+        ],
+        correctAnswer: 1,
+        explanation: 'AVL tree rotations are triggered when the balance factor of any node becomes ±2, violating the AVL property.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bal-3',
+        topic: 'trees',
+        moduleId: 'balanced-trees',
+        difficulty: 'advanced' as const,
+        question: 'What is the key difference between AVL and Red-Black trees?',
+        options: [
+            'AVL trees are more strictly balanced',
+            'Red-Black trees don\'t use rotations',
+            'AVL trees allow duplicates',
+            'Red-Black trees are always shorter'
+        ],
+        correctAnswer: 0,
+        explanation: 'AVL trees are more strictly balanced (height difference ≤ 1) while Red-Black trees are approximately balanced, making AVL better for search-heavy operations.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bal-4',
+        topic: 'trees',
+        moduleId: 'balanced-trees',
+        difficulty: 'advanced' as const,
+        question: 'What are the two types of rotations in AVL trees?',
+        options: [
+            'Left and Right',
+            'Single and Double',
+            'Clockwise and Counter-clockwise',
+            'Forward and Backward'
+        ],
+        correctAnswer: 1,
+        explanation: 'AVL trees use Single rotations (LL, RR) and Double rotations (LR, RL) to rebalance the tree.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'bal-5',
+        topic: 'trees',
+        moduleId: 'balanced-trees',
+        difficulty: 'advanced' as const,
+        question: 'What is the guaranteed height of an AVL tree with n nodes?',
+        options: ['O(log n)', 'O(n)', 'O(√n)', 'O(n log n)'],
+        correctAnswer: 0,
+        explanation: 'AVL trees guarantee O(log n) height due to their strict balancing property, ensuring optimal search performance.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+
+    // Advanced Tree Algorithms Module
+    {
+        id: 'tree-alg-1',
+        topic: 'trees',
+        moduleId: 'tree-algorithms',
+        difficulty: 'advanced' as const,
+        question: 'What is the Lowest Common Ancestor (LCA) of two nodes in a tree?',
+        options: [
+            'The root node',
+            'The deepest node that is an ancestor of both nodes',
+            'The parent of one of the nodes',
+            'The node with the smallest value'
+        ],
+        correctAnswer: 1,
+        explanation: 'The LCA is the deepest (farthest from root) node that is an ancestor of both given nodes.',
+        timeComplexity: 'O(log n)',
+        spaceComplexity: 'O(1)'
+    },
+    {
+        id: 'tree-alg-2',
+        topic: 'trees',
+        moduleId: 'tree-algorithms',
+        difficulty: 'advanced' as const,
+        question: 'What is the time complexity of finding diameter of a binary tree?',
+        options: ['O(log n)', 'O(n)', 'O(n log n)', 'O(n²)'],
+        correctAnswer: 1,
+        explanation: 'Finding the diameter requires visiting each node once to calculate heights, resulting in O(n) time complexity.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(h)'
+    },
+    {
+        id: 'tree-alg-3',
+        topic: 'trees',
+        moduleId: 'tree-algorithms',
+        difficulty: 'advanced' as const,
+        question: 'How do you serialize a binary tree?',
+        options: [
+            'Store only the leaf nodes',
+            'Use pre-order traversal with null markers',
+            'Store nodes level by level',
+            'Use in-order traversal only'
+        ],
+        correctAnswer: 1,
+        explanation: 'Serialization typically uses pre-order traversal with special markers for null nodes to preserve tree structure.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(n)'
+    },
+    {
+        id: 'tree-alg-4',
+        topic: 'trees',
+        moduleId: 'tree-algorithms',
+        difficulty: 'advanced' as const,
+        question: 'What algorithm efficiently finds the kth smallest element in a BST?',
+        options: [
+            'Extract all elements then sort',
+            'In-order traversal with counter',
+            'Level-order traversal',
+            'Pre-order traversal'
+        ],
+        correctAnswer: 1,
+        explanation: 'In-order traversal of BST visits nodes in sorted order, so we can use a counter to find the kth smallest element.',
+        timeComplexity: 'O(k)',
+        spaceComplexity: 'O(h)'
+    },
+    {
+        id: 'tree-alg-5',
+        topic: 'trees',
+        moduleId: 'tree-algorithms',
+        difficulty: 'advanced' as const,
+        question: 'What is the Morris traversal technique?',
+        options: [
+            'A recursive traversal method',
+            'In-order traversal without recursion or stack',
+            'A method to balance trees',
+            'A way to delete entire trees'
+        ],
+        correctAnswer: 1,
+        explanation: 'Morris traversal allows in-order traversal of a binary tree without using recursion or stack by temporarily modifying tree links.',
+        timeComplexity: 'O(n)',
+        spaceComplexity: 'O(1)'
+    },
+
     // Trees Basics
     {
         id: 'tree-basics-1',
