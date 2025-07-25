@@ -11,17 +11,15 @@ import { motion } from 'framer-motion';
 interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
-  onViewLeaderboard: () => void;
   onViewProfile: () => void;
-  currentUser: UserProfile;
-  completedModules: string[]; // Array of completed module IDs
-  moduleScores: Record<string, number>; // moduleId -> best score
+  currentUser: UserProfile | null;
+  completedModules: string[];
+  moduleScores: Record<string, number>;
 }
 
 export function TopicSelection({
   onTopicSelect,
   onViewProgress,
-  onViewLeaderboard,
   onViewProfile,
   currentUser,
   completedModules,
@@ -101,17 +99,13 @@ export function TopicSelection({
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={onViewProgress}>
+            <TrendingUp size={16} className="mr-2" />
+            Progress
+          </Button>
           <Button variant="outline" size="sm" onClick={onViewProfile}>
             <User size={16} className="mr-2" />
             Profile
-          </Button>
-          <Button variant="outline" size="sm" onClick={onViewLeaderboard}>
-            <Trophy size={16} className="mr-2" />
-            Leaderboard
-          </Button>
-          <Button variant="outline" size="sm" onClick={onViewProgress}>
-            <BarChart3 size={16} className="mr-2" />
-            Progress
           </Button>
         </div>
       </motion.div>

@@ -40,18 +40,11 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
       email: editForm.email
     };
 
-    // Update user in localStorage
+    // Update user profile directly (no users array storage)
     try {
-      const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
-      const userIndex = users.findIndex((u: UserProfile) => u.id === user.id);
-
-      if (userIndex !== -1) {
-        users[userIndex] = updatedUser;
-        localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
-        onUpdateProfile(updatedUser);
-        setIsEditing(false);
-        toast.success('Profile updated successfully!');
-      }
+      onUpdateProfile(updatedUser);
+      setIsEditing(false);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       toast.error('Failed to update profile');
     }

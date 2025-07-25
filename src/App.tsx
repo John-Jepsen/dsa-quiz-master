@@ -6,7 +6,6 @@ import { ModuleSelection } from '@/components/ModuleSelection';
 import { Quiz } from '@/components/Quiz';
 import { QuizResults } from '@/components/QuizResults';
 import { ProgressTracking } from '@/components/ProgressTracking';
-import { Leaderboard } from '@/components/Leaderboard';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
 import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
@@ -14,7 +13,7 @@ import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'leaderboard' | 'profile';
+type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('auth');
@@ -120,18 +119,14 @@ function App() {
         [currentModule.id]: Math.max(prev[currentModule.id] || 0, scorePercentage)
       }));
 
-      // Update user's overall stats
-      const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
-      const userIndex = users.findIndex((u: UserProfile) => u.id === currentUser.id);
+      // Update current user's stats locally
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          totalQuizzes: currentUser.totalQuizzes + 1,
+          bestOverallScore: Math.max(currentUser.bestOverallScore, scorePercentage)
+        };
 
-      if (userIndex !== -1) {
-        users[userIndex].totalQuizzes += 1;
-        const allScores = Object.values(moduleScores);
-        const currentBest = allScores.length > 0 ? Math.max(...allScores, scorePercentage) : scorePercentage;
-        users[userIndex].bestOverallScore = Math.max(users[userIndex].bestOverallScore, currentBest);
-        localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
-
-        const updatedUser = users[userIndex];
         setCurrentUser(updatedUser);
         localStorage.setItem('dsa-quiz-current-user', JSON.stringify(updatedUser));
 
@@ -170,10 +165,6 @@ function App() {
     setAppState('progress');
   };
 
-  const handleViewLeaderboard = () => {
-    setAppState('leaderboard');
-  };
-
   const handleViewProfile = () => {
     setAppState('profile');
   };
@@ -204,7 +195,6 @@ function App() {
         <TopicSelection
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
-          onViewLeaderboard={handleViewLeaderboard}
           onViewProfile={handleViewProfile}
           currentUser={currentUser}
           completedModules={completedModules}
@@ -245,13 +235,6 @@ function App() {
         <ProgressTracking
           onBack={handleBackToTopics}
           userProgress={{}} // TODO: Adapt this component for new module system
-        />
-      )}
-
-      {appState === 'leaderboard' && currentUser && (
-        <Leaderboard
-          currentUser={currentUser}
-          onBack={handleBackToTopics}
         />
       )}
 

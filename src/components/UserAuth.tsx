@@ -25,7 +25,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!username.trim()) {
@@ -33,49 +33,28 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
       return;
     }
 
-    if (username.trim().length < 2) {
-      toast.error('Username must be at least 2 characters');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // Get existing users from localStorage
-      const users = JSON.parse(localStorage.getItem('dsa-quiz-users') || '[]');
-      let user = users.find((u: UserProfile) => u.username.toLowerCase() === username.trim().toLowerCase());
+      // Create user profile without storing in users list
+      const user = {
+        id: Date.now().toString(),
+        username: username.trim(),
+        email: `${username.trim()}@local.demo`, // Auto-generate email
+        displayName: username.trim(),
+        createdAt: new Date().toISOString(),
+        totalQuizzes: 0,
+        bestOverallScore: 0
+      };
 
-      if (!user) {
-        // Create new user automatically
-        user = {
-          id: Date.now().toString(),
-          username: username.trim(),
-          email: `${username.trim()}@local.demo`, // Auto-generate email
-          displayName: username.trim(),
-          createdAt: new Date().toISOString(),
-          totalQuizzes: 0,
-          bestOverallScore: 0
-        };
-
-        // Save new user to localStorage
-        users.push(user);
-        localStorage.setItem('dsa-quiz-users', JSON.stringify(users));
-
-        toast.success(`Welcome to DSA Quiz Master, ${user.displayName}! 🎉`);
-        onRegister(user);
-      } else {
-        // User exists, log them in
-        toast.success(`Welcome back, ${user.displayName}! 👋`);
-        onLogin(user);
-      }
+      toast.success(`Welcome to DSA Quiz Master, ${user.displayName}! 🎉`);
+      onRegister(user);
     } catch (error) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error('Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  return (
+  }; return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
@@ -84,7 +63,7 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
         </div>
 
         <Card>
-          <form onSubmit={handleAuth}>
+          <form onSubmit={handleSubmit}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5" />
