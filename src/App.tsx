@@ -7,13 +7,16 @@ import { Quiz } from '@/components/Quiz';
 import { QuizResults } from '@/components/QuizResults';
 import { ProgressTracking } from '@/components/ProgressTracking';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
+import { CodePracticeSelection } from '@/components/CodePracticeSelection';
+import { CodePractice } from '@/components/CodePractice';
 import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
+import { CodeExercise } from '@/lib/code-exercises';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile';
+type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('auth');
@@ -21,6 +24,7 @@ function App() {
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [currentModule, setCurrentModule] = useState<QuizModule | null>(null);
   const [currentTopic, setCurrentTopic] = useState<string>('');
+  const [currentExercise, setCurrentExercise] = useState<CodeExercise | null>(null);
   const [quizScore, setQuizScore] = useState(0);
 
   // Check for existing user session on app load
@@ -169,6 +173,26 @@ function App() {
     setAppState('profile');
   };
 
+  const handleCodePractice = () => {
+    setAppState('code-practice-selection');
+  };
+
+  const handleExerciseSelect = (exercise: CodeExercise) => {
+    setCurrentExercise(exercise);
+    setAppState('code-practice');
+  };
+
+  const handleExerciseComplete = () => {
+    toast.success('Exercise completed! Great job! 🎉');
+    setAppState('code-practice-selection');
+    setCurrentExercise(null);
+  };
+
+  const handleBackToCodePractice = () => {
+    setAppState('code-practice-selection');
+    setCurrentExercise(null);
+  };
+
   const getCurrentTopicName = () => {
     if (currentTopic === 'random') return 'Mixed Topics';
     const topic = enhancedQuizTopics.find(t => t.id === currentTopic);
@@ -196,6 +220,7 @@ function App() {
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
           onViewProfile={handleViewProfile}
+          onCodePractice={handleCodePractice}
           currentUser={currentUser}
           completedModules={completedModules}
           moduleScores={moduleScores}
@@ -244,6 +269,21 @@ function App() {
           onBack={handleBackToTopics}
           onLogout={handleLogout}
           onUpdateProfile={handleUpdateProfile}
+        />
+      )}
+
+      {appState === 'code-practice-selection' && (
+        <CodePracticeSelection
+          onExerciseSelect={handleExerciseSelect}
+          onBack={handleBackToTopics}
+        />
+      )}
+
+      {appState === 'code-practice' && currentExercise && (
+        <CodePractice
+          exercise={currentExercise}
+          onComplete={handleExerciseComplete}
+          onBack={handleBackToCodePractice}
         />
       )}
 
