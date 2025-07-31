@@ -12,6 +12,7 @@ interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
   onViewProfile: () => void;
+  onCodePractice?: () => void;
   currentUser: UserProfile | null;
   completedModules: string[];
   moduleScores: Record<string, number>;
@@ -21,6 +22,7 @@ export function TopicSelection({
   onTopicSelect,
   onViewProgress,
   onViewProfile,
+  onCodePractice,
   currentUser,
   completedModules,
   moduleScores
@@ -264,16 +266,28 @@ export function TopicSelection({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
-        className="text-center pt-8"
+        className="text-center pt-8 space-y-4"
       >
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => onTopicSelect('random')}
-          className="px-8"
-        >
-          🎲 Random Quiz (Mixed Topics)
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => onTopicSelect('random')}
+            className="px-8"
+          >
+            🎲 Random Quiz (Mixed Topics)
+          </Button>
+          {onCodePractice && (
+            <Button
+              variant="default"
+              size="lg"
+              onClick={onCodePractice}
+              className="px-8"
+            >
+              💻 Code Practice (Hands-on)
+            </Button>
+          )}
+        </div>
       </motion.div>
     </div>
   );
