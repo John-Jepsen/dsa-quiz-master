@@ -17,8 +17,8 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
-  // Configure base path for GitHub Pages deployment
-  base: process.env.NODE_ENV === 'production' ? '/dsa-quiz-master/' : '/',
+  // Configure base path - remove GitHub Pages specific base for Vercel deployment
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

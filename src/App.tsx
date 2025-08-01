@@ -15,6 +15,7 @@ import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
 import { CodeExercise } from '@/lib/code-exercises';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
+import { VisitCounter } from '@/components/VisitCounter';
 
 type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice';
 
@@ -288,6 +289,11 @@ function App() {
       )}
 
       <Toaster />
+      
+      {/* Visit Counter - Fixed position in bottom right */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <VisitCounter />
+      </div>
     </div>
   );
 }
