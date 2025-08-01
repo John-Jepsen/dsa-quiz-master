@@ -16,6 +16,7 @@ import { ProgressTracking } from '@/components/ProgressTracking';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
 import { CodePracticeSelection } from '@/components/CodePracticeSelection';
 import { CodePractice } from '@/components/CodePractice';
+import { FloatingSubmitButton } from '@/components/FloatingSubmitButton';
 import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
@@ -356,6 +357,9 @@ function AppContent() {
 
       <Toaster />
       <DatabaseDebugger />
+
+      {/* Floating Submit Button - shows on all pages except auth */}
+      {appState !== 'auth' && <FloatingSubmitButton />}
     </div>
   );
 }

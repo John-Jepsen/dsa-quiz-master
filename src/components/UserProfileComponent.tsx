@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { User, Mail, Calendar, Trophy, LogOut, Settings } from 'lucide-react';
+import { User, Mail, Calendar, Trophy, LogOut, Settings, Upload } from 'lucide-react';
 import { UserProfile } from '@/types';
+import { ProgressSubmission } from './ProgressSubmission';
 import { toast } from 'sonner';
 
 interface UserProfileComponentProps {
@@ -246,6 +247,11 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Progress Submission Section */}
+        <div className="mt-8">
+          <ProgressSubmission />
         </div>
       </div>
     </div>
