@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
-import { UserProfile } from './UserAuth';
+import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 
 interface TopicSelectionProps {

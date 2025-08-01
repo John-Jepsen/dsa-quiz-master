@@ -3,59 +3,11 @@
  * Provides structured storage for quiz data, user progress, and session management
  */
 
-// Database schemas
-export interface QuizProgress {
-  id: string;
-  userId: string;
-  moduleId: string;
-  topicId: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  completedAt: Date;
-  timeSpent: number; // in milliseconds
-}
+// Import unified types
+import type { UserProfile, UserSession, QuizProgress, QuizAttempt } from '../types';
 
-export interface UserSession {
-  id: string;
-  userId: string;
-  createdAt: Date;
-  lastActive: Date;
-  preferences: {
-    theme: 'light' | 'dark' | 'system';
-    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'mixed';
-    soundEnabled: boolean;
-  };
-}
-
-export interface UserProfile {
-  id: string;
-  username: string;
-  email?: string;
-  createdAt: Date;
-  totalScore: number;
-  completedModules: string[];
-  achievements: string[];
-  stats: {
-    totalQuizzesTaken: number;
-    totalTimeSpent: number;
-    averageScore: number;
-    streakDays: number;
-    lastQuizDate?: Date;
-  };
-}
-
-export interface QuizAttempt {
-  id: string;
-  userId: string;
-  moduleId: string;
-  questionId: string;
-  userAnswer: number;
-  correctAnswer: number;
-  isCorrect: boolean;
-  timeSpent: number;
-  timestamp: Date;
-}
+// Re-export types for convenience
+export type { UserProfile, UserSession, QuizProgress, QuizAttempt } from '../types';
 
 // Database configuration
 const DB_NAME = 'DSAQuizMasterDB';
@@ -65,7 +17,7 @@ export class DatabaseService {
   private db: IDBDatabase | null = null;
   private static instance: DatabaseService | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): DatabaseService {
     if (!DatabaseService.instance) {
@@ -96,7 +48,7 @@ export class DatabaseService {
 
       request.onsuccess = () => {
         this.db = request.result;
-        
+
         // Add error handler for database
         this.db.onerror = (event) => {
           console.error('Database error:', event);
@@ -159,7 +111,7 @@ export class DatabaseService {
     if (!this.db) {
       throw new Error('Database not initialized. Call initialize() first.');
     }
-    
+
     if (this.db.version !== DB_VERSION) {
       throw new Error('Database version mismatch. Please refresh the page.');
     }
@@ -178,17 +130,25 @@ export class DatabaseService {
   // User Profile operations
   async createUserProfile(profile: Omit<UserProfile, 'id' | 'createdAt'>): Promise<string> {
     this.ensureDatabase();
-    
+
     const newProfile: UserProfile = {
       ...profile,
       id: this.generateId(),
       createdAt: new Date(),
+      stats: {
+        ...profile.stats,
+        lastQuizDate: profile.stats.lastQuizDate
+          ? (typeof profile.stats.lastQuizDate === 'string'
+            ? new Date(profile.stats.lastQuizDate)
+            : profile.stats.lastQuizDate)
+          : undefined
+      }
     };
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['userProfiles'], 'readwrite');
       this.handleTransactionError(transaction, 'createUserProfile');
-      
+
       const store = transaction.objectStore('userProfiles');
       const request = store.add(newProfile);
 
@@ -280,7 +240,7 @@ export class DatabaseService {
         }
 
         // Return the most recent session
-        const latestSession = sessions.sort((a, b) => 
+        const latestSession = sessions.sort((a, b) =>
           new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime()
         )[0];
 
@@ -308,7 +268,7 @@ export class DatabaseService {
 
         session.lastActive = new Date();
         const putRequest = store.put(session);
-        
+
         putRequest.onsuccess = () => resolve();
         putRequest.onerror = () => reject(new Error('Failed to update session activity'));
       };
@@ -413,8 +373,8 @@ export class DatabaseService {
 
     const totalQuizzesTaken = progress.length;
     const totalTimeSpent = progress.reduce((sum, p) => sum + p.timeSpent, 0);
-    const averageScore = totalQuizzesTaken > 0 
-      ? progress.reduce((sum, p) => sum + p.score, 0) / totalQuizzesTaken 
+    const averageScore = totalQuizzesTaken > 0
+      ? progress.reduce((sum, p) => sum + p.score, 0) / totalQuizzesTaken
       : 0;
 
     // Calculate streak (simplified - consecutive days with quiz activity)
@@ -425,12 +385,12 @@ export class DatabaseService {
 
     let streakDays = 0;
     const today = new Date().toDateString();
-    
+
     for (let i = 0; i < quizDates.length; i++) {
       const daysDiff = Math.floor(
         (new Date(today).getTime() - new Date(quizDates[i]).getTime()) / (1000 * 60 * 60 * 24)
       );
-      
+
       if (daysDiff === i) {
         streakDays++;
       } else {
@@ -438,7 +398,7 @@ export class DatabaseService {
       }
     }
 
-    const lastQuizDate = progress.length > 0 
+    const lastQuizDate = progress.length > 0
       ? new Date(Math.max(...progress.map(p => new Date(p.completedAt).getTime())))
       : undefined;
 
@@ -460,10 +420,10 @@ export class DatabaseService {
     this.ensureDatabase();
 
     const storeNames = ['userProfiles', 'userSessions', 'quizProgress', 'quizAttempts'];
-    
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(storeNames, 'readwrite');
-      
+
       let completed = 0;
       const onComplete = () => {
         completed++;

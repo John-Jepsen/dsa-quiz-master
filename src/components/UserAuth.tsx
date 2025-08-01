@@ -6,21 +6,12 @@ import { Label } from '@/components/ui/label';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { User, Zap } from 'lucide-react';
 import { useGitHubAuth } from '@/hooks/useGitHubAuth';
+import { UserProfile } from '@/types';
 import { toast } from 'sonner';
 
 interface UserAuthProps {
   onLogin: (user: UserProfile) => void;
   onRegister: (user: UserProfile) => void;
-}
-
-export interface UserProfile {
-  id: string;
-  username: string;
-  email: string;
-  displayName: string;
-  createdAt: string;
-  totalQuizzes: number;
-  bestOverallScore: number;
 }
 
 export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
@@ -36,14 +27,23 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
   const handleGitHubDemo = () => {
     const demoUsername = 'demo-user';
     simulateLogin(demoUsername);
-    
+
     // Convert GitHub user to UserProfile format
-    const user = {
+    const user: UserProfile = {
       id: `github-${Date.now()}`,
       username: demoUsername,
       email: `${demoUsername}@github.demo`,
       displayName: `GitHub User (${demoUsername})`,
       createdAt: new Date().toISOString(),
+      totalScore: 0,
+      completedModules: [],
+      achievements: [],
+      stats: {
+        totalQuizzesTaken: 0,
+        totalTimeSpent: 0,
+        averageScore: 0,
+        streakDays: 0,
+      },
       totalQuizzes: 0,
       bestOverallScore: 0
     };
@@ -64,12 +64,21 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
 
     try {
       // Create user profile without storing in users list
-      const user = {
+      const user: UserProfile = {
         id: Date.now().toString(),
         username: localUsername.trim(),
         email: `${localUsername.trim()}@local.demo`, // Auto-generate email
         displayName: localUsername.trim(),
         createdAt: new Date().toISOString(),
+        totalScore: 0,
+        completedModules: [],
+        achievements: [],
+        stats: {
+          totalQuizzesTaken: 0,
+          totalTimeSpent: 0,
+          averageScore: 0,
+          streakDays: 0,
+        },
         totalQuizzes: 0,
         bestOverallScore: 0
       };
@@ -102,9 +111,9 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button 
-                onClick={handleGitHubLogin} 
-                className="w-full" 
+              <Button
+                onClick={handleGitHubLogin}
+                className="w-full"
                 disabled={githubLoading}
                 variant="outline"
               >
@@ -114,9 +123,9 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
                 <p className="text-xs text-muted-foreground mb-2">
                   Demo mode (GitHub OAuth requires backend setup)
                 </p>
-                <Button 
-                  onClick={handleGitHubDemo} 
-                  className="w-full" 
+                <Button
+                  onClick={handleGitHubDemo}
+                  className="w-full"
                   size="sm"
                   variant="secondary"
                 >

@@ -5,7 +5,9 @@ import { DatabaseProvider, DatabaseLoader } from '@/components/DatabaseProvider'
 import { DatabaseDebugger } from '@/components/DatabaseDebugger';
 import '@/services/database-utils'; // Import for development utilities
 import '@/services/database-test'; // Import for testing utilities
-import { UserAuth, UserProfile } from '@/components/UserAuth';
+import '@/scripts/bootstrap-database'; // Initialize database on app start
+import { UserAuth } from '@/components/UserAuth';
+import { UserProfile, normalizeUserProfile } from '@/types';
 import { TopicSelection } from '@/components/TopicSelection';
 import { ModuleSelection } from '@/components/ModuleSelection';
 import { Quiz } from '@/components/Quiz';
@@ -28,7 +30,7 @@ function AppContent() {
   const { profile: currentUser, updateProfile } = useUserProfile();
   const { progress, saveProgress, getModuleProgress } = useQuizProgress();
   const { saveAttempt } = useQuizAttempts();
-  
+
   const [appState, setAppState] = useState<AppState>('auth');
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [currentModule, setCurrentModule] = useState<QuizModule | null>(null);
@@ -108,7 +110,14 @@ function AppContent() {
 
   const handleUpdateProfile = (updatedUser: UserProfile) => {
     if (updateProfile) {
-      updateProfile(updatedUser);
+      // Convert dates properly for database storage
+      const updates: Partial<UserProfile> = {
+        ...updatedUser,
+        createdAt: typeof updatedUser.createdAt === 'string'
+          ? new Date(updatedUser.createdAt)
+          : updatedUser.createdAt
+      };
+      updateProfile(updates);
     }
   };
 
@@ -146,7 +155,7 @@ function AppContent() {
     setAppState('quiz');
   };
 
-  const handleQuizComplete = async (score: number, totalQuestions: number, questionAttempts?: Array<{questionId: string; userAnswer: number; correctAnswer: number; timeSpent: number}>) => {
+  const handleQuizComplete = async (score: number, totalQuestions: number, questionAttempts?: Array<{ questionId: string; userAnswer: number; correctAnswer: number; timeSpent: number }>) => {
     setQuizScore(score);
 
     if (currentModule && currentUser) {
@@ -279,7 +288,7 @@ function AppContent() {
           onViewProgress={handleViewProgress}
           onViewProfile={handleViewProfile}
           onCodePractice={handleCodePractice}
-          currentUser={currentUser}
+          currentUser={normalizeUserProfile(currentUser)}
           completedModules={completedModules}
           moduleScores={moduleScores}
         />
@@ -323,7 +332,7 @@ function AppContent() {
 
       {appState === 'profile' && currentUser && (
         <UserProfileComponent
-          user={currentUser}
+          user={normalizeUserProfile(currentUser)}
           onBack={handleBackToTopics}
           onLogout={handleLogout}
           onUpdateProfile={handleUpdateProfile}

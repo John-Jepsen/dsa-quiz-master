@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Calendar, Trophy, LogOut, Settings } from 'lucide-react';
-import { UserProfile } from './UserAuth';
+import { UserProfile } from '@/types';
 import { toast } from 'sonner';
 
 interface UserProfileComponentProps {
@@ -19,8 +19,8 @@ interface UserProfileComponentProps {
 export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }: UserProfileComponentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    displayName: user.displayName,
-    email: user.email
+    displayName: user.displayName || user.username,
+    email: user.email || ''
   });
 
   const handleSaveProfile = () => {
