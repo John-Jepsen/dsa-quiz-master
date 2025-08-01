@@ -4,6 +4,7 @@ import { useUserProfile, useQuizProgress, useQuizAttempts } from '@/hooks/useDat
 import { DatabaseProvider, DatabaseLoader } from '@/components/DatabaseProvider';
 import { DatabaseDebugger } from '@/components/DatabaseDebugger';
 import '@/services/database-utils'; // Import for development utilities
+import '@/services/database-test'; // Import for testing utilities
 import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
 import { ModuleSelection } from '@/components/ModuleSelection';
