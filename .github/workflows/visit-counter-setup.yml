@@ -1,0 +1,48 @@
+name: Update Visit Count Permissions
+
+on:
+  workflow_dispatch: # Allow manual triggering
+  schedule:
+    # Run once daily to ensure the token has the necessary permissions
+    - cron: '0 0 * * *'
+
+jobs:
+  check-permissions:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write # Required for the serverless function to commit back to repo
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Verify GITHUB_TOKEN permissions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking if GITHUB_TOKEN has write permissions to contents..."
+          
+          # Test write permission by checking the repository
+          curl -H "Authorization: token $GITHUB_TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/${{ github.repository }}
+          
+          echo "GITHUB_TOKEN permissions verified for visit counter functionality"
+          
+      - name: Initialize visit counter if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if count.json exists and has valid content
+          if [ ! -f "count.json" ] || [ ! -s "count.json" ]; then
+            echo "Initializing count.json..."
+            echo '{ "visits": 0 }' > count.json
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add count.json
+            git commit -m "Initialize visit counter" || echo "No changes to commit"
+            git push || echo "No changes to push"
+          else
+            echo "count.json already exists and is valid"
+          fi
