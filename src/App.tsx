@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useGitHubAuth } from '@/hooks/useGitHubAuth';
 import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
 import { ModuleSelection } from '@/components/ModuleSelection';
@@ -19,6 +20,7 @@ import { toast } from 'sonner';
 type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice';
 
 function App() {
+  const { handleCallback, user: githubUser } = useGitHubAuth();
   const [appState, setAppState] = useState<AppState>('auth');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
@@ -26,6 +28,45 @@ function App() {
   const [currentTopic, setCurrentTopic] = useState<string>('');
   const [currentExercise, setCurrentExercise] = useState<CodeExercise | null>(null);
   const [quizScore, setQuizScore] = useState(0);
+
+  // Handle OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+
+    if (code && state) {
+      handleCallback(code, state)
+        .then(() => {
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((error) => {
+          console.error('Authentication failed:', error);
+          toast.error('Authentication failed. Please try again.');
+        });
+    }
+  }, [handleCallback]);
+
+  // Handle GitHub user login
+  useEffect(() => {
+    if (githubUser && !currentUser) {
+      const userProfile: UserProfile = {
+        id: `github-${githubUser.id}`,
+        username: githubUser.login,
+        email: githubUser.email || `${githubUser.login}@github.com`,
+        displayName: githubUser.name || githubUser.login,
+        createdAt: new Date().toISOString(),
+        totalQuizzes: 0,
+        bestOverallScore: 0
+      };
+      
+      setCurrentUser(userProfile);
+      localStorage.setItem('dsa-quiz-current-user', JSON.stringify(userProfile));
+      setAppState('topic-selection');
+      toast.success(`Welcome back, ${userProfile.displayName}! 🎉`);
+    }
+  }, [githubUser, currentUser]);
 
   // Check for existing user session on app load
   useEffect(() => {

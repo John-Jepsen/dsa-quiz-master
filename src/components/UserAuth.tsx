@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { User, Zap } from 'lucide-react';
+import { useGitHubAuth } from '@/hooks/useGitHubAuth';
 import { toast } from 'sonner';
 
 interface UserAuthProps {
@@ -22,13 +24,38 @@ export interface UserProfile {
 }
 
 export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
-  const [username, setUsername] = useState('');
+  const { login: gitHubLogin, isLoading: githubLoading, simulateLogin } = useGitHubAuth();
+  const [localUsername, setLocalUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleGitHubLogin = () => {
+    gitHubLogin();
+  };
+
+  // For demo purposes - simulate GitHub login
+  const handleGitHubDemo = () => {
+    const demoUsername = 'demo-user';
+    simulateLogin(demoUsername);
+    
+    // Convert GitHub user to UserProfile format
+    const user = {
+      id: `github-${Date.now()}`,
+      username: demoUsername,
+      email: `${demoUsername}@github.demo`,
+      displayName: `GitHub User (${demoUsername})`,
+      createdAt: new Date().toISOString(),
+      totalQuizzes: 0,
+      bestOverallScore: 0
+    };
+
+    toast.success(`Welcome via GitHub, ${user.displayName}! 🎉`);
+    onRegister(user);
+  };
+
+  const handleLocalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username.trim()) {
+    if (!localUsername.trim()) {
       toast.error('Please enter a username');
       return;
     }
@@ -39,9 +66,9 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
       // Create user profile without storing in users list
       const user = {
         id: Date.now().toString(),
-        username: username.trim(),
-        email: `${username.trim()}@local.demo`, // Auto-generate email
-        displayName: username.trim(),
+        username: localUsername.trim(),
+        email: `${localUsername.trim()}@local.demo`, // Auto-generate email
+        displayName: localUsername.trim(),
         createdAt: new Date().toISOString(),
         totalQuizzes: 0,
         bestOverallScore: 0
@@ -62,36 +89,84 @@ export function UserAuth({ onLogin, onRegister }: UserAuthProps) {
           <p className="text-muted-foreground">Master Data Structures & Algorithms</p>
         </div>
 
-        <Card>
-          <form onSubmit={handleSubmit}>
+        <div className="space-y-4">
+          {/* GitHub Authentication */}
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                Get Started
+                <GitHubLogoIcon className="w-5 h-5" />
+                Sign in with GitHub
               </CardTitle>
               <CardDescription>
-                Enter a username to start learning! We'll create your account automatically.
+                Use your GitHub account for a personalized experience
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Choose any username..."
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={isLoading}
-                  autoFocus
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading || !username.trim()}>
-                {isLoading ? 'Getting you ready...' : 'Start Learning! 🚀'}
+            <CardContent className="space-y-3">
+              <Button 
+                onClick={handleGitHubLogin} 
+                className="w-full" 
+                disabled={githubLoading}
+                variant="outline"
+              >
+                {githubLoading ? 'Connecting...' : 'Continue with GitHub'}
               </Button>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground mb-2">
+                  Demo mode (GitHub OAuth requires backend setup)
+                </p>
+                <Button 
+                  onClick={handleGitHubDemo} 
+                  className="w-full" 
+                  size="sm"
+                  variant="secondary"
+                >
+                  Try GitHub Demo
+                </Button>
+              </div>
             </CardContent>
-          </form>
-        </Card>
+          </Card>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">Or</span>
+            </div>
+          </div>
+
+          {/* Local Authentication */}
+          <Card>
+            <form onSubmit={handleLocalSubmit}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  Quick Start
+                </CardTitle>
+                <CardDescription>
+                  Enter a username to start learning locally
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Choose any username..."
+                    value={localUsername}
+                    onChange={(e) => setLocalUsername(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading || !localUsername.trim()}>
+                  {isLoading ? 'Getting you ready...' : 'Start Learning! 🚀'}
+                </Button>
+              </CardContent>
+            </form>
+          </Card>
+        </div>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
