@@ -75,21 +75,48 @@ export class DatabaseService {
   }
 
   async initialize(): Promise<void> {
+    if (this.db) {
+      return; // Already initialized
+    }
+
     return new Promise((resolve, reject) => {
+      // Check if IndexedDB is supported
+      if (!window.indexedDB) {
+        reject(new Error('IndexedDB is not supported in this browser'));
+        return;
+      }
+
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
-        reject(new Error('Failed to open database'));
+        const error = request.error;
+        console.error('Database initialization failed:', error);
+        reject(new Error(`Failed to open database: ${error?.message || 'Unknown error'}`));
       };
 
       request.onsuccess = () => {
         this.db = request.result;
+        
+        // Add error handler for database
+        this.db.onerror = (event) => {
+          console.error('Database error:', event);
+        };
+
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        this.createTables(db);
+        try {
+          const db = (event.target as IDBOpenDBRequest).result;
+          this.createTables(db);
+        } catch (error) {
+          console.error('Database upgrade failed:', error);
+          reject(new Error('Failed to upgrade database schema'));
+        }
+      };
+
+      request.onblocked = () => {
+        console.warn('Database upgrade blocked. Please close other tabs with this application.');
       };
     });
   }
@@ -132,6 +159,20 @@ export class DatabaseService {
     if (!this.db) {
       throw new Error('Database not initialized. Call initialize() first.');
     }
+    
+    if (this.db.version !== DB_VERSION) {
+      throw new Error('Database version mismatch. Please refresh the page.');
+    }
+  }
+
+  private handleTransactionError(transaction: IDBTransaction, operation: string): void {
+    transaction.onerror = () => {
+      console.error(`Transaction failed for ${operation}:`, transaction.error);
+    };
+
+    transaction.onabort = () => {
+      console.error(`Transaction aborted for ${operation}:`, transaction.error);
+    };
   }
 
   // User Profile operations
@@ -146,11 +187,20 @@ export class DatabaseService {
 
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['userProfiles'], 'readwrite');
+      this.handleTransactionError(transaction, 'createUserProfile');
+      
       const store = transaction.objectStore('userProfiles');
       const request = store.add(newProfile);
 
       request.onsuccess = () => resolve(newProfile.id);
-      request.onerror = () => reject(new Error('Failed to create user profile'));
+      request.onerror = () => {
+        const error = request.error;
+        if (error?.name === 'ConstraintError') {
+          reject(new Error('Username already exists'));
+        } else {
+          reject(new Error(`Failed to create user profile: ${error?.message || 'Unknown error'}`));
+        }
+      };
     });
   }
 

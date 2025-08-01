@@ -6,18 +6,21 @@ An interactive Data Structures and Algorithms quiz application built with React,
 
 - **Multi-topic Quizzes**: Test your knowledge on arrays, linked lists, trees, graphs, sorting algorithms, and more
 - **User Authentication**: Personal profiles with progress tracking
+- **Database Storage**: Persistent data storage using IndexedDB
 - **Real-time Progress**: Track your performance across different topics
 - **Leaderboards**: Compete with other users and see your rankings
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Modern UI**: Built with Tailwind CSS and Radix UI components
+- **Offline Support**: Works offline with local database storage
 
 ## �️ Tech Stack
 
 - **Frontend**: React 19, TypeScript
+- **Database**: IndexedDB (browser-based)
 - **Styling**: Tailwind CSS, Radix UI
 - **Build Tool**: Vite
 - **Deployment**: GitHub Pages with GitHub Actions
-- **State Management**: React Hooks + Local Storage
+- **State Management**: React Hooks + IndexedDB
 
 ## 🎯 Getting Started
 
@@ -51,6 +54,18 @@ npm run dev
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint
+
+## 🗄️ Database
+
+This application uses IndexedDB for client-side data storage, providing:
+
+- **Persistent Storage**: Data survives browser restarts and updates
+- **Offline Support**: Works without internet connection
+- **Automatic Migration**: Seamlessly migrates from localStorage to IndexedDB
+- **Data Export**: Backup functionality for user data
+- **Development Tools**: Debug panel in development mode
+
+For more details, see [DATABASE.md](DATABASE.md).
 
 ## 🌐 Live Demo
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useGitHubAuth } from '@/hooks/useGitHubAuth';
 import { useUserProfile, useQuizProgress, useQuizAttempts } from '@/hooks/useDatabase';
 import { DatabaseProvider, DatabaseLoader } from '@/components/DatabaseProvider';
+import { DatabaseDebugger } from '@/components/DatabaseDebugger';
+import '@/services/database-utils'; // Import for development utilities
 import { UserAuth, UserProfile } from '@/components/UserAuth';
 import { TopicSelection } from '@/components/TopicSelection';
 import { ModuleSelection } from '@/components/ModuleSelection';
@@ -343,6 +345,7 @@ function AppContent() {
       )}
 
       <Toaster />
+      <DatabaseDebugger />
     </div>
   );
 }
