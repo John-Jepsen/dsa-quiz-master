@@ -17,7 +17,9 @@
         "build:gh-pages": "NODE_ENV=production npm run build",
         "lint": "eslint .",
         "optimize": "vite optimize",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "verify-deployment": "node scripts/verify-deployment.js",
+        "deploy-status": "echo '🌐 Live at: https://john-jepsen.github.io/dsa-quiz-master/' && npm run verify-deployment"
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",

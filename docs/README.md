@@ -1,5 +1,7 @@
 # 🧠 DSA Quiz Master
 
+**🌐 Live Application**: https://john-jepsen.github.io/dsa-quiz-master/
+
 An interactive Data Structures and Algorithms quiz app built with React, TypeScript, and Vite. Test your knowledge across DSA topics with real-time progress tracking and leaderboards.
 
 ## Features
@@ -14,7 +16,7 @@ An interactive Data Structures and Algorithms quiz app built with React, TypeScr
 - React 19, TypeScript, Vite
 - IndexedDB (browser-based)
 - Tailwind CSS, Radix UI
-- GitHub Pages deployment
+- GitHub Pages deployment (✅ **COMPLETED**)
 
 ## Getting Started
 1. Clone the repo & install dependencies:
@@ -34,9 +36,15 @@ An interactive Data Structures and Algorithms quiz app built with React, TypeScr
 - `npm run build` — Build for production
 - `npm run preview` — Preview production build
 - `npm run lint` — Run ESLint
+- `npm run deploy-status` — Check deployment status and live URL
+- `npm run verify-deployment` — Verify deployment configuration
+
+## Deployment Status: ✅ COMPLETED
+The application is fully deployed and hosted on GitHub Pages with automatic continuous deployment.
 
 ## More
-- See `docs/deployment.md` for deployment
+- See `docs/deployment.md` for deployment details
+- See `DEPLOYMENT-CHECKLIST.md` for complete deployment verification
 - See `docs/database.md` for database details
 - See `docs/prd.md` for product requirements
 - See `docs/github-auth.md` for GitHub OAuth setup
