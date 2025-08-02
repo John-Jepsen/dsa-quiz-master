@@ -6,6 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { database, UserProfile, QuizProgress, UserSession, QuizAttempt } from '../services/database';
 import { migrationService } from '../services/migration';
+import { syncService } from '../services/sync-service';
+import { databaseCache } from '../services/database-cache';
 
 // Hook for user profile management
 export function useUserProfile() {
@@ -27,12 +29,21 @@ export function useUserProfile() {
         userId = await migrationService.createDefaultUser();
       }
 
-      // Load the user profile
-      const userProfile = await database.getUserProfile(userId);
-      if (userProfile) {
-        setProfile(userProfile);
+      // Try to get from cache first
+      let userProfile = databaseCache.getUserProfile(userId);
+      
+      if (!userProfile) {
+        // Load from database if not in cache
+        userProfile = await database.getUserProfile(userId);
+        if (userProfile) {
+          // Cache the profile
+          databaseCache.cacheUserProfile(userId, userProfile);
+          setProfile(userProfile);
+        } else {
+          throw new Error('User profile not found');
+        }
       } else {
-        throw new Error('User profile not found');
+        setProfile(userProfile);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load user profile');
@@ -48,7 +59,14 @@ export function useUserProfile() {
     try {
       setError(null);
       await database.updateUserProfile(profile.id, updates);
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      const updatedProfile = { ...profile, ...updates };
+      setProfile(updatedProfile);
+      
+      // Update cache
+      databaseCache.cacheUserProfile(profile.id, updatedProfile);
+      
+      // Queue sync operation
+      syncService.queueOperation('update', 'userProfiles', { id: profile.id, ...updates });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
       console.error('Error updating profile:', err);
@@ -84,7 +102,16 @@ export function useQuizProgress() {
         throw new Error('No user found');
       }
 
-      const userProgress = await database.getUserProgress(userId);
+      // Try cache first
+      let userProgress = databaseCache.getUserProgress(userId);
+      
+      if (!userProgress) {
+        // Load from database if not cached
+        userProgress = await database.getUserProgress(userId);
+        // Cache the progress
+        databaseCache.cacheUserProgress(userId, userProgress);
+      }
+      
       setProgress(userProgress);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load progress');
@@ -110,7 +137,7 @@ export function useQuizProgress() {
         throw new Error('No user found');
       }
 
-      const progressId = await database.saveQuizProgress({
+      const progressData = {
         userId,
         moduleId,
         topicId,
@@ -118,7 +145,15 @@ export function useQuizProgress() {
         totalQuestions,
         correctAnswers,
         timeSpent,
-      });
+      };
+
+      const progressId = await database.saveQuizProgress(progressData);
+
+      // Queue sync operation
+      syncService.queueOperation('create', 'quizProgress', { id: progressId, ...progressData });
+
+      // Invalidate cache for this user's progress
+      databaseCache.invalidateUserProgress(userId);
 
       // Reload progress to get the updated list
       await loadProgress();
@@ -132,7 +167,9 @@ export function useQuizProgress() {
   }, [loadProgress]);
 
   const getModuleProgress = useCallback((moduleId: string) => {
-    return progress.filter(p => p.moduleId === moduleId);
+    // Try to get from cache first if we have a user ID
+    const cachedProgress = progress.filter(p => p.moduleId === moduleId);
+    return cachedProgress;
   }, [progress]);
 
   const getTopicProgress = useCallback((topicId: string) => {
@@ -259,7 +296,7 @@ export function useQuizAttempts() {
         throw new Error('No user found');
       }
 
-      const attemptId = await database.saveQuizAttempt({
+      const attemptData = {
         userId,
         moduleId,
         questionId,
@@ -267,7 +304,12 @@ export function useQuizAttempts() {
         correctAnswer,
         isCorrect: userAnswer === correctAnswer,
         timeSpent,
-      });
+      };
+
+      const attemptId = await database.saveQuizAttempt(attemptData);
+
+      // Queue sync operation
+      syncService.queueOperation('create', 'quizAttempts', { id: attemptId, ...attemptData });
 
       // Add the new attempt to the local state
       const newAttempt: QuizAttempt = {
