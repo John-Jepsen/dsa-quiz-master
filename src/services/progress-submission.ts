@@ -29,7 +29,6 @@ export interface SubmissionResponse {
 
 class ProgressSubmissionService {
     private static instance: ProgressSubmissionService | null = null;
-    private readonly API_BASE_URL = process.env.VITE_API_URL || 'https://api.dsaquizmaster.com';
     private readonly APP_VERSION = '1.0.0';
 
     private constructor() { }
@@ -86,42 +85,22 @@ class ProgressSubmissionService {
     }
 
     /**
-     * Submits progress data to remote database
+     * Submits progress data to local storage
      */
     async submitProgress(progressData: ProgressSubmissionData): Promise<SubmissionResponse> {
         try {
-            console.log('📤 Submitting progress to remote database...');
+            console.log('📤 Saving progress to local storage...');
             console.log(`Data size: ${Math.round(progressData.metadata.totalDataSize / 1024)}KB`);
 
-            // In development, simulate API call
-            if (process.env.NODE_ENV === 'development') {
-                return this.simulateSubmission(progressData);
-            }
-
-            // Real API call for production
-            const response = await fetch(`${this.API_BASE_URL}/api/progress/submit`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.getAuthToken()}`,
-                    'X-App-Version': this.APP_VERSION,
-                },
-                body: JSON.stringify(progressData),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const result: SubmissionResponse = await response.json();
-            return result;
+            // Local storage submission only
+            return this.saveToLocalStorage(progressData);
 
         } catch (error) {
-            console.error('Error submitting progress:', error);
+            console.error('Error saving progress:', error);
             return {
                 success: false,
                 submissionId: progressData.metadata.submissionId,
-                message: `Submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                message: `Save failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 errors: [error instanceof Error ? error.message : 'Unknown error']
             };
         }
@@ -151,27 +130,12 @@ class ProgressSubmissionService {
     }
 
     /**
-     * Gets submission history for a user
+     * Gets submission history for a user from local storage
      */
     async getSubmissionHistory(userId: string): Promise<any[]> {
         try {
-            if (process.env.NODE_ENV === 'development') {
-                // Return mock history in development
-                return this.getMockSubmissionHistory(userId);
-            }
-
-            const response = await fetch(`${this.API_BASE_URL}/api/progress/history/${userId}`, {
-                headers: {
-                    'Authorization': `Bearer ${this.getAuthToken()}`,
-                    'X-App-Version': this.APP_VERSION,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            return await response.json();
+            // Return submission history from local storage
+            return this.getLocalSubmissionHistory(userId);
         } catch (error) {
             console.error('Error getting submission history:', error);
             return [];
@@ -233,16 +197,16 @@ class ProgressSubmissionService {
     }
 
     private getAuthToken(): string {
-        return localStorage.getItem('auth-token') || 'development-token';
+        return localStorage.getItem('auth-token') || 'local-token';
     }
 
     private generateSubmissionId(): string {
         return `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    private async simulateSubmission(data: ProgressSubmissionData): Promise<SubmissionResponse> {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+    private async saveToLocalStorage(data: ProgressSubmissionData): Promise<SubmissionResponse> {
+        // Simulate processing delay
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // Validate data
         const validation = this.validateProgressData(data);
@@ -255,17 +219,7 @@ class ProgressSubmissionService {
             };
         }
 
-        // Simulate occasional failures for testing
-        if (Math.random() < 0.1) { // 10% failure rate
-            return {
-                success: false,
-                submissionId: data.metadata.submissionId,
-                message: 'Simulated server error',
-                errors: ['Connection timeout', 'Server temporarily unavailable']
-            };
-        }
-
-        // Store in localStorage for development
+        // Store in localStorage
         const submissions = JSON.parse(localStorage.getItem('progress-submissions') || '[]');
         submissions.push({
             submissionId: data.metadata.submissionId,
@@ -280,11 +234,11 @@ class ProgressSubmissionService {
         return {
             success: true,
             submissionId: data.metadata.submissionId,
-            message: 'Progress submitted successfully to development storage'
+            message: 'Progress saved successfully to local storage'
         };
     }
 
-    private getMockSubmissionHistory(userId: string): any[] {
+    private getLocalSubmissionHistory(userId: string): any[] {
         const submissions = JSON.parse(localStorage.getItem('progress-submissions') || '[]');
         return submissions.filter((s: any) => s.userId === userId);
     }

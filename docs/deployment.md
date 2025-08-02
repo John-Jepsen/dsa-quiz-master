@@ -30,6 +30,7 @@ Your app will be available at: `https://yourusername.github.io/repository-name/`
 - **Assets missing**: Ensure all imports use correct paths
 
 ### Alternative Hosting
-- Netlify, Vercel, Firebase Hosting are also supported
+- GitHub Pages (primary deployment method)
+- Static hosting platforms like Surge.sh or similar
 
 *Auto-deploys on every push to main branch* 🔄

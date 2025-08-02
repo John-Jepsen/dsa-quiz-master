@@ -61,31 +61,16 @@ export class SyncService {
   }
 
   private async checkConnectivity(): Promise<void> {
-    try {
-      // Try to fetch a small resource to verify real connectivity
-      const response = await fetch('/ping', { 
-        method: 'HEAD',
-        cache: 'no-cache',
-        signal: AbortSignal.timeout(5000)
-      });
-      
-      const wasOnline = this.isOnline;
-      this.isOnline = response.ok;
-      
-      if (!wasOnline && this.isOnline) {
-        // Just came back online
-        this.notifyListeners();
-        this.attemptSync();
-      } else if (wasOnline && !this.isOnline) {
-        // Just went offline
-        this.notifyListeners();
-      }
-    } catch {
-      // If fetch fails, we're likely offline
-      if (this.isOnline) {
-        this.isOnline = false;
-        this.notifyListeners();
-      }
+    // For local-only operation, just use navigator.onLine
+    const wasOnline = this.isOnline;
+    this.isOnline = navigator.onLine;
+    
+    if (!wasOnline && this.isOnline) {
+      // Just came back online
+      this.notifyListeners();
+    } else if (wasOnline && !this.isOnline) {
+      // Just went offline
+      this.notifyListeners();
     }
   }
 
@@ -173,47 +158,20 @@ export class SyncService {
     this.syncInProgress = true;
     this.notifyListeners();
 
-    let successCount = 0;
-    const maxRetries = 3;
-
     try {
-      // Process operations in chronological order
-      const operations = [...this.pendingOperations].sort(
-        (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
-      );
-
-      for (const operation of operations) {
-        try {
-          const success = await this.executeOperation(operation);
-          
-          if (success) {
-            // Remove successful operation
-            this.pendingOperations = this.pendingOperations.filter(op => op.id !== operation.id);
-            successCount++;
-          } else {
-            // Increment retry count
-            operation.retryCount++;
-            
-            // Remove operation if max retries exceeded
-            if (operation.retryCount >= maxRetries) {
-              console.error(`Max retries exceeded for operation ${operation.id}`);
-              this.pendingOperations = this.pendingOperations.filter(op => op.id !== operation.id);
-            }
-          }
-        } catch (error) {
-          console.error(`Error executing operation ${operation.id}:`, error);
-          operation.retryCount++;
-          
-          if (operation.retryCount >= maxRetries) {
-            this.pendingOperations = this.pendingOperations.filter(op => op.id !== operation.id);
-          }
-        }
+      // For local-only operation, we'll just log the operations and mark them as processed
+      console.log('🔄 Processing local operations...');
+      
+      for (const operation of this.pendingOperations) {
+        console.log(`[LOCAL] Processing ${operation.type} on ${operation.table}:`, operation.data);
       }
 
+      // Clear all pending operations as they're now "processed" locally
+      this.pendingOperations = [];
       this.lastSyncTime = new Date();
       this.savePendingOperations();
 
-      return successCount > 0;
+      return true;
     } finally {
       this.syncInProgress = false;
       this.notifyListeners();
@@ -221,26 +179,12 @@ export class SyncService {
   }
 
   private async executeOperation(operation: PendingOperation): Promise<boolean> {
-    // For now, this is a placeholder since we don't have a server backend
-    // In a real implementation, this would make API calls to sync with a server
-    
+    // For local-only operation, just log and return success
     try {
-      // Simulate network operation
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Log the operation for debugging
-      console.log(`[SYNC] Would execute ${operation.type} on ${operation.table}:`, operation.data);
-      
-      // For now, just return true to simulate successful sync
-      // In real implementation, this would:
-      // 1. Make HTTP request to server
-      // 2. Handle server response
-      // 3. Update local data if needed
-      // 4. Return success/failure
-      
+      console.log(`[LOCAL] Would execute ${operation.type} on ${operation.table}:`, operation.data);
       return true;
     } catch (error) {
-      console.error('Error executing sync operation:', error);
+      console.error('Error processing local operation:', error);
       return false;
     }
   }
@@ -255,10 +199,7 @@ export class SyncService {
   }
 
   public async forcSync(): Promise<boolean> {
-    if (!this.isOnline) {
-      return false;
-    }
-
+    // For local-only operation, always return true
     return this.attemptSync();
   }
 
