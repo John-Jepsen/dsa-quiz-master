@@ -14,6 +14,8 @@ interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
   onViewProfile: () => void;
+  onViewAchievements?: () => void;
+  onViewLeaderboard?: () => void;
   onCodePractice?: () => void;
   currentUser: UserProfile | null;
   completedModules: string[];
@@ -24,6 +26,8 @@ export function TopicSelection({
   onTopicSelect,
   onViewProgress,
   onViewProfile,
+  onViewAchievements,
+  onViewLeaderboard,
   onCodePractice,
   currentUser,
   completedModules,
@@ -103,7 +107,7 @@ export function TopicSelection({
             <p className="text-muted-foreground">Ready to level up your DSA skills?</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onViewProgress}>
             <TrendingUp size={16} className="mr-2" />
             Progress
@@ -112,6 +116,18 @@ export function TopicSelection({
             <User size={16} className="mr-2" />
             Profile
           </Button>
+          {onViewAchievements && (
+            <Button variant="outline" size="sm" onClick={onViewAchievements}>
+              <Award size={16} className="mr-2" />
+              Achievements
+            </Button>
+          )}
+          {onViewLeaderboard && (
+            <Button variant="outline" size="sm" onClick={onViewLeaderboard}>
+              <Trophy size={16} className="mr-2" />
+              Leaderboard
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
