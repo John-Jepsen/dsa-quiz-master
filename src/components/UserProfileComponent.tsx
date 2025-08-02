@@ -20,7 +20,7 @@ interface UserProfileComponentProps {
 export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }: UserProfileComponentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    displayName: user.displayName || user.username,
+    displayName: user.displayName || user.username || '',
     email: user.email || ''
   });
 
@@ -53,32 +53,36 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
 
   const handleCancelEdit = () => {
     setEditForm({
-      displayName: user.displayName,
-      email: user.email
+      displayName: user.displayName || user.username || '',
+      email: user.email || ''
     });
     setIsEditing(false);
   };
 
   const getAchievementBadges = () => {
-    const badges = [];
+    const badges: Array<{ text: string; color: string }> = [];
+    const bestScore = user.bestOverallScore || 0;
+    const totalQuizzes = user.totalQuizzes || 0;
 
-    if (user.bestOverallScore >= 90) badges.push({ text: 'Quiz Master', color: 'bg-yellow-500' });
-    if (user.bestOverallScore >= 80) badges.push({ text: 'Expert', color: 'bg-blue-500' });
-    if (user.totalQuizzes >= 20) badges.push({ text: 'Dedicated', color: 'bg-purple-500' });
-    if (user.totalQuizzes >= 10) badges.push({ text: 'Enthusiast', color: 'bg-green-500' });
+    if (bestScore >= 90) badges.push({ text: 'Quiz Master', color: 'bg-yellow-500' });
+    if (bestScore >= 80) badges.push({ text: 'Expert', color: 'bg-blue-500' });
+    if (totalQuizzes >= 20) badges.push({ text: 'Dedicated', color: 'bg-purple-500' });
+    if (totalQuizzes >= 10) badges.push({ text: 'Enthusiast', color: 'bg-green-500' });
 
     return badges;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateInput: string | Date) => {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
   };
 
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return 'U';
     return name
       .split(' ')
       .map(word => word[0])
@@ -105,8 +109,8 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar className="w-16 h-16">
-                    <AvatarFallback className="text-lg font-semibold bg-primary text-primary-foreground">
-                      {getInitials(user.displayName)}
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
+                      {getInitials(user.displayName || user.username)}
                     </AvatarFallback>
                   </Avatar>
                   <div>

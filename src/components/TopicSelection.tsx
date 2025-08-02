@@ -95,11 +95,11 @@ export function TopicSelection({
         <div className="flex items-center gap-4">
           <Avatar className="w-12 h-12">
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {getInitials(currentUser.displayName)}
+              {currentUser ? getInitials(currentUser.displayName || currentUser.username) : 'U'}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-xl font-semibold">Welcome back, {currentUser.displayName}!</h2>
+            <h2 className="text-xl font-semibold">Welcome back, {currentUser?.displayName || currentUser?.username}!</h2>
             <p className="text-muted-foreground">Ready to level up your DSA skills?</p>
           </div>
         </div>
