@@ -4,14 +4,14 @@
  */
 
 // Import unified types
-import type { UserProfile, UserSession, QuizProgress, QuizAttempt } from '../types';
+import type { UserProfile, UserSession, QuizProgress, QuizAttempt, Achievement, UserAchievement, LeaderboardEntry, TopicLeaderboard } from '../types';
 
 // Re-export types for convenience
-export type { UserProfile, UserSession, QuizProgress, QuizAttempt } from '../types';
+export type { UserProfile, UserSession, QuizProgress, QuizAttempt, Achievement, UserAchievement, LeaderboardEntry, TopicLeaderboard } from '../types';
 
 // Database configuration
 const DB_NAME = 'DSAQuizMasterDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Updated for achievements and leaderboard tables
 
 export class DatabaseService {
   private db: IDBDatabase | null = null;
@@ -104,6 +104,30 @@ export class DatabaseService {
       attemptStore.createIndex('moduleId', 'moduleId', { unique: false });
       attemptStore.createIndex('questionId', 'questionId', { unique: false });
       attemptStore.createIndex('timestamp', 'timestamp', { unique: false });
+    }
+
+    // Achievements table (master list of all achievements)
+    if (!db.objectStoreNames.contains('achievements')) {
+      const achievementStore = db.createObjectStore('achievements', { keyPath: 'id' });
+      achievementStore.createIndex('category', 'category', { unique: false });
+      achievementStore.createIndex('rarity', 'rarity', { unique: false });
+    }
+
+    // User achievements table (tracks which achievements users have unlocked)
+    if (!db.objectStoreNames.contains('userAchievements')) {
+      const userAchievementStore = db.createObjectStore('userAchievements', { keyPath: 'id' });
+      userAchievementStore.createIndex('userId', 'userId', { unique: false });
+      userAchievementStore.createIndex('achievementId', 'achievementId', { unique: false });
+      userAchievementStore.createIndex('unlockedAt', 'unlockedAt', { unique: false });
+    }
+
+    // Leaderboard entries table (pre-computed leaderboard data)
+    if (!db.objectStoreNames.contains('leaderboardEntries')) {
+      const leaderboardStore = db.createObjectStore('leaderboardEntries', { keyPath: 'id' });
+      leaderboardStore.createIndex('userId', 'userId', { unique: false });
+      leaderboardStore.createIndex('totalScore', 'totalScore', { unique: false });
+      leaderboardStore.createIndex('averageScore', 'averageScore', { unique: false });
+      leaderboardStore.createIndex('lastActiveAt', 'lastActiveAt', { unique: false });
     }
   }
 
@@ -438,6 +462,206 @@ export class DatabaseService {
         request.onsuccess = onComplete;
         request.onerror = () => reject(new Error(`Failed to clear ${storeName}`));
       });
+    });
+  }
+
+  // Achievement operations
+  async initializeAchievements(achievements: Achievement[]): Promise<void> {
+    this.ensureDatabase();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['achievements'], 'readwrite');
+      this.handleTransactionError(transaction, 'initializeAchievements');
+
+      const store = transaction.objectStore('achievements');
+      let completed = 0;
+
+      const onComplete = () => {
+        completed++;
+        if (completed === achievements.length) {
+          resolve();
+        }
+      };
+
+      achievements.forEach(achievement => {
+        const request = store.put(achievement);
+        request.onsuccess = onComplete;
+        request.onerror = () => reject(new Error(`Failed to initialize achievement: ${achievement.id}`));
+      });
+
+      if (achievements.length === 0) {
+        resolve();
+      }
+    });
+  }
+
+  async getUserAchievements(userId: string): Promise<UserAchievement[]> {
+    this.ensureDatabase();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['userAchievements'], 'readonly');
+      const store = transaction.objectStore('userAchievements');
+      const index = store.index('userId');
+      const request = index.getAll(userId);
+
+      request.onsuccess = () => {
+        const achievements = request.result.map(achievement => ({
+          ...achievement,
+          unlockedAt: typeof achievement.unlockedAt === 'string'
+            ? achievement.unlockedAt
+            : achievement.unlockedAt.toISOString()
+        }));
+        resolve(achievements);
+      };
+      request.onerror = () => reject(new Error('Failed to get user achievements'));
+    });
+  }
+
+  async unlockAchievement(userId: string, achievementId: string): Promise<string> {
+    this.ensureDatabase();
+
+    // Check if already unlocked
+    const existingAchievements = await this.getUserAchievements(userId);
+    if (existingAchievements.some(ua => ua.achievementId === achievementId)) {
+      throw new Error('Achievement already unlocked');
+    }
+
+    const userAchievement: UserAchievement = {
+      id: this.generateId(),
+      userId,
+      achievementId,
+      unlockedAt: new Date(),
+      progress: 100
+    };
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['userAchievements'], 'readwrite');
+      this.handleTransactionError(transaction, 'unlockAchievement');
+
+      const store = transaction.objectStore('userAchievements');
+      const request = store.add(userAchievement);
+
+      request.onsuccess = () => resolve(userAchievement.id);
+      request.onerror = () => reject(new Error('Failed to unlock achievement'));
+    });
+  }
+
+  async getAllAchievements(): Promise<Achievement[]> {
+    this.ensureDatabase();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['achievements'], 'readonly');
+      const store = transaction.objectStore('achievements');
+      const request = store.getAll();
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(new Error('Failed to get achievements'));
+    });
+  }
+
+  // Leaderboard operations
+  async updateLeaderboardEntry(entry: Omit<LeaderboardEntry, 'id' | 'rank'>): Promise<string> {
+    this.ensureDatabase();
+
+    // Check if entry exists for this user
+    const existingEntry = await this.getLeaderboardEntryByUserId(entry.userId);
+    
+    if (existingEntry) {
+      // Update existing entry
+      const updatedEntry: LeaderboardEntry = {
+        ...existingEntry,
+        ...entry,
+        lastActiveAt: new Date()
+      };
+
+      return new Promise((resolve, reject) => {
+        const transaction = this.db!.transaction(['leaderboardEntries'], 'readwrite');
+        this.handleTransactionError(transaction, 'updateLeaderboardEntry');
+
+        const store = transaction.objectStore('leaderboardEntries');
+        const request = store.put(updatedEntry);
+
+        request.onsuccess = () => resolve(existingEntry.id);
+        request.onerror = () => reject(new Error('Failed to update leaderboard entry'));
+      });
+    } else {
+      // Create new entry
+      const newEntry: LeaderboardEntry = {
+        id: this.generateId(),
+        ...entry,
+        lastActiveAt: new Date()
+      };
+
+      return new Promise((resolve, reject) => {
+        const transaction = this.db!.transaction(['leaderboardEntries'], 'readwrite');
+        this.handleTransactionError(transaction, 'updateLeaderboardEntry');
+
+        const store = transaction.objectStore('leaderboardEntries');
+        const request = store.add(newEntry);
+
+        request.onsuccess = () => resolve(newEntry.id);
+        request.onerror = () => reject(new Error('Failed to create leaderboard entry'));
+      });
+    }
+  }
+
+  async getLeaderboardEntryByUserId(userId: string): Promise<LeaderboardEntry | null> {
+    this.ensureDatabase();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['leaderboardEntries'], 'readonly');
+      const store = transaction.objectStore('leaderboardEntries');
+      const index = store.index('userId');
+      const request = index.get(userId);
+
+      request.onsuccess = () => {
+        const entry = request.result;
+        if (entry) {
+          const normalizedEntry = {
+            ...entry,
+            lastActiveAt: typeof entry.lastActiveAt === 'string'
+              ? entry.lastActiveAt
+              : entry.lastActiveAt.toISOString()
+          };
+          resolve(normalizedEntry);
+        } else {
+          resolve(null);
+        }
+      };
+      request.onerror = () => reject(new Error('Failed to get leaderboard entry'));
+    });
+  }
+
+  async getGlobalLeaderboard(limit: number = 50): Promise<LeaderboardEntry[]> {
+    this.ensureDatabase();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(['leaderboardEntries'], 'readonly');
+      const store = transaction.objectStore('leaderboardEntries');
+      const index = store.index('totalScore');
+      const request = index.openCursor(null, 'prev'); // Descending order by total score
+
+      const entries: LeaderboardEntry[] = [];
+      let rank = 1;
+
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest).result;
+        if (cursor && entries.length < limit) {
+          const entry = cursor.value;
+          entries.push({
+            ...entry,
+            rank,
+            lastActiveAt: typeof entry.lastActiveAt === 'string'
+              ? entry.lastActiveAt
+              : entry.lastActiveAt.toISOString()
+          });
+          rank++;
+          cursor.continue();
+        } else {
+          resolve(entries);
+        }
+      };
+      request.onerror = () => reject(new Error('Failed to get global leaderboard'));
     });
   }
 

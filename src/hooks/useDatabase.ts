@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { database, UserProfile, QuizProgress, UserSession, QuizAttempt } from '../services/database';
+import { database, UserProfile, QuizProgress, UserSession, QuizAttempt, Achievement, UserAchievement, LeaderboardEntry } from '../services/database';
 import { migrationService } from '../services/migration';
 import { syncService } from '../services/sync-service';
 import { databaseCache } from '../services/database-cache';
@@ -460,5 +460,171 @@ export function useDatabase() {
     reset,
     exportData,
     refetch: initialize,
+  };
+}
+
+// Hook for achievement management
+export function useAchievements() {
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadAchievements = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Load all achievements
+      const allAchievements = await database.getAllAchievements();
+      setAchievements(allAchievements);
+
+      // Load user's unlocked achievements
+      const userId = await migrationService.getCurrentUserId();
+      if (userId) {
+        const userUnlocked = await database.getUserAchievements(userId);
+        setUserAchievements(userUnlocked);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load achievements');
+      console.error('Error loading achievements:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const unlockAchievement = useCallback(async (achievementId: string) => {
+    try {
+      setError(null);
+
+      const userId = await migrationService.getCurrentUserId();
+      if (!userId) {
+        throw new Error('No user found');
+      }
+
+      // Check if already unlocked
+      if (userAchievements.some(ua => ua.achievementId === achievementId)) {
+        return false; // Already unlocked
+      }
+
+      const unlockId = await database.unlockAchievement(userId, achievementId);
+      
+      // Add to local state
+      const newAchievement: UserAchievement = {
+        id: unlockId,
+        userId,
+        achievementId,
+        unlockedAt: new Date(),
+        progress: 100
+      };
+
+      setUserAchievements(prev => [...prev, newAchievement]);
+      return true; // Successfully unlocked
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to unlock achievement');
+      console.error('Error unlocking achievement:', err);
+      return false;
+    }
+  }, [userAchievements]);
+
+  const getUnlockedAchievements = useCallback(() => {
+    return achievements.filter(achievement => 
+      userAchievements.some(ua => ua.achievementId === achievement.id)
+    );
+  }, [achievements, userAchievements]);
+
+  const getLockedAchievements = useCallback(() => {
+    return achievements.filter(achievement => 
+      !userAchievements.some(ua => ua.achievementId === achievement.id) && !achievement.isSecret
+    );
+  }, [achievements, userAchievements]);
+
+  const isAchievementUnlocked = useCallback((achievementId: string) => {
+    return userAchievements.some(ua => ua.achievementId === achievementId);
+  }, [userAchievements]);
+
+  useEffect(() => {
+    loadAchievements();
+  }, [loadAchievements]);
+
+  return {
+    achievements,
+    userAchievements,
+    loading,
+    error,
+    unlockAchievement,
+    getUnlockedAchievements,
+    getLockedAchievements,
+    isAchievementUnlocked,
+    refetch: loadAchievements,
+  };
+}
+
+// Hook for leaderboard management
+export function useLeaderboard() {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [userRank, setUserRank] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const entries = await database.getGlobalLeaderboard(50);
+      setLeaderboard(entries);
+
+      // Find current user's rank
+      const userId = await migrationService.getCurrentUserId();
+      if (userId) {
+        const userEntry = entries.find(entry => entry.userId === userId);
+        setUserRank(userEntry?.rank || null);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load leaderboard');
+      console.error('Error loading leaderboard:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateUserLeaderboardEntry = useCallback(async (userProfile: UserProfile) => {
+    try {
+      setError(null);
+
+      const entry: Omit<LeaderboardEntry, 'id' | 'rank'> = {
+        userId: userProfile.id,
+        username: userProfile.username,
+        displayName: userProfile.displayName,
+        totalScore: userProfile.totalScore,
+        averageScore: userProfile.stats.averageScore,
+        completedModules: userProfile.completedModules.length,
+        totalQuizzes: userProfile.stats.totalQuizzesTaken,
+        achievementCount: userProfile.achievements.length,
+        lastActiveAt: new Date()
+      };
+
+      await database.updateLeaderboardEntry(entry);
+      
+      // Refresh leaderboard to show updated position
+      await loadLeaderboard();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update leaderboard');
+      console.error('Error updating leaderboard:', err);
+    }
+  }, [loadLeaderboard]);
+
+  useEffect(() => {
+    loadLeaderboard();
+  }, [loadLeaderboard]);
+
+  return {
+    leaderboard,
+    userRank,
+    loading,
+    error,
+    updateUserLeaderboardEntry,
+    refetch: loadLeaderboard,
   };
 }
