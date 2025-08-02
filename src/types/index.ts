@@ -87,7 +87,55 @@ export function normalizeUserProfile(profile: UserProfile): UserProfile {
                 : undefined
         }
     };
-}// Helper function to convert UI UserProfile to Database UserProfile
+}// Achievement System Types
+export interface Achievement {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    category: 'progress' | 'performance' | 'streak' | 'mastery' | 'social';
+    condition: {
+        type: 'quiz_count' | 'score_threshold' | 'streak_days' | 'module_completion' | 'perfect_score' | 'time_based';
+        target: number;
+        moduleId?: string; // For module-specific achievements
+        topicId?: string;  // For topic-specific achievements
+    };
+    rarity: 'common' | 'rare' | 'epic' | 'legendary';
+    unlockedAt?: Date | string;
+    isSecret?: boolean; // Hidden until unlocked
+}
+
+export interface UserAchievement {
+    id: string;
+    userId: string;
+    achievementId: string;
+    unlockedAt: Date | string;
+    progress?: number; // Current progress towards the achievement (0-100)
+}
+
+// Leaderboard Types
+export interface LeaderboardEntry {
+    id: string;
+    userId: string;
+    username: string;
+    displayName?: string;
+    totalScore: number;
+    averageScore: number;
+    completedModules: number;
+    totalQuizzes: number;
+    achievementCount: number;
+    lastActiveAt: Date | string;
+    rank?: number; // Calculated rank
+}
+
+export interface TopicLeaderboard {
+    topicId: string;
+    topicName: string;
+    entries: LeaderboardEntry[];
+    lastUpdated: Date | string;
+}
+
+// Helper function to convert UI UserProfile to Database UserProfile
 export function toDatabaseUserProfile(profile: UserProfile): UserProfile {
     return {
         id: profile.id,

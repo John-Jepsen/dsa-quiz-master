@@ -5,6 +5,7 @@
 
 import { database } from '../services/database';
 import { migrationService } from '../services/migration';
+import { achievementService } from '../services/achievement-service';
 
 let initializationPromise: Promise<void> | null = null;
 
@@ -27,6 +28,10 @@ export async function bootstrapDatabase(): Promise<void> {
             if (migrationNeeded) {
                 console.log('✅ Data migration completed');
             }
+
+            // Initialize achievement system
+            await achievementService.initialize();
+            console.log('✅ Achievement system initialized');
 
             // Log success
             console.log('🎉 Database bootstrap completed successfully');

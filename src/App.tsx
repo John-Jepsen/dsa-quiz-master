@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGitHubAuth } from '@/hooks/useGitHubAuth';
-import { useUserProfile, useQuizProgress, useQuizAttempts } from '@/hooks/useDatabase';
+import { useUserProfile, useQuizProgress, useQuizAttempts, useAchievements, useLeaderboard } from '@/hooks/useDatabase';
 import { DatabaseProvider, DatabaseLoader } from '@/components/DatabaseProvider';
 import { DatabaseDebugger } from '@/components/DatabaseDebugger';
 import '@/services/database-utils'; // Import for development utilities
@@ -16,21 +16,26 @@ import { ProgressTracking } from '@/components/ProgressTracking';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
 import { CodePracticeSelection } from '@/components/CodePracticeSelection';
 import { CodePractice } from '@/components/CodePractice';
+import { AchievementsPage } from '@/components/AchievementsPage';
+import { LeaderboardPage } from '@/components/LeaderboardPage';
 import { FloatingSubmitButton } from '@/components/FloatingSubmitButton';
 import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
 import { CodeExercise } from '@/lib/code-exercises';
+import { achievementService } from '@/services/achievement-service';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice';
+type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice' | 'achievements' | 'leaderboard';
 
 function AppContent() {
   const { handleCallback, user: githubUser } = useGitHubAuth();
   const { profile: currentUser, updateProfile } = useUserProfile();
   const { progress, saveProgress, getModuleProgress } = useQuizProgress();
   const { saveAttempt } = useQuizAttempts();
+  const { unlockAchievement } = useAchievements();
+  const { updateUserLeaderboardEntry } = useLeaderboard();
 
   const [appState, setAppState] = useState<AppState>('auth');
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
@@ -187,14 +192,51 @@ function AppContent() {
           }
         }
 
-        // Update user stats
-        const newStats = {
-          ...currentUser.stats,
-          totalQuizzesTaken: currentUser.stats.totalQuizzesTaken + 1,
-          totalTimeSpent: currentUser.stats.totalTimeSpent + timeSpent,
+        // Update user stats and calculate average score
+        const newTotalQuizzes = currentUser.stats.totalQuizzesTaken + 1;
+        const newTotalScore = currentUser.totalScore + scorePercentage;
+        const newAverageScore = Math.round((currentUser.stats.averageScore * currentUser.stats.totalQuizzesTaken + scorePercentage) / newTotalQuizzes);
+        
+        const updatedProfile = {
+          ...currentUser,
+          totalScore: newTotalScore,
+          stats: {
+            ...currentUser.stats,
+            totalQuizzesTaken: newTotalQuizzes,
+            totalTimeSpent: currentUser.stats.totalTimeSpent + timeSpent,
+            averageScore: newAverageScore,
+            lastQuizDate: new Date()
+          }
         };
 
-        await updateProfile({ stats: newStats });
+        await updateProfile(updatedProfile);
+
+        // Check for achievements
+        try {
+          const unlockedAchievements = await achievementService.checkAndUnlockAchievements(
+            currentUser.id,
+            updatedProfile,
+            progress,
+            {
+              justCompletedQuiz: true,
+              lastQuizScore: scorePercentage,
+              lastQuizTime: timeSpent
+            }
+          );
+
+          if (unlockedAchievements.length > 0) {
+            console.log('New achievements unlocked:', unlockedAchievements);
+          }
+        } catch (error) {
+          console.error('Error checking achievements:', error);
+        }
+
+        // Update leaderboard
+        try {
+          await updateUserLeaderboardEntry(updatedProfile);
+        } catch (error) {
+          console.error('Error updating leaderboard:', error);
+        }
 
         // Show achievement toast for good scores
         if (scorePercentage >= 80) {
@@ -245,6 +287,14 @@ function AppContent() {
     setAppState('code-practice-selection');
   };
 
+  const handleViewAchievements = () => {
+    setAppState('achievements');
+  };
+
+  const handleViewLeaderboard = () => {
+    setAppState('leaderboard');
+  };
+
   const handleExerciseSelect = (exercise: CodeExercise) => {
     setCurrentExercise(exercise);
     setAppState('code-practice');
@@ -288,6 +338,8 @@ function AppContent() {
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
           onViewProfile={handleViewProfile}
+          onViewAchievements={handleViewAchievements}
+          onViewLeaderboard={handleViewLeaderboard}
           onCodePractice={handleCodePractice}
           currentUser={normalizeUserProfile(currentUser)}
           completedModules={completedModules}
@@ -352,6 +404,19 @@ function AppContent() {
           exercise={currentExercise}
           onComplete={handleExerciseComplete}
           onBack={handleBackToCodePractice}
+        />
+      )}
+
+      {appState === 'achievements' && (
+        <AchievementsPage
+          onBack={handleBackToTopics}
+        />
+      )}
+
+      {appState === 'leaderboard' && (
+        <LeaderboardPage
+          onBack={handleBackToTopics}
+          currentUserId={currentUser?.id}
         />
       )}
 
