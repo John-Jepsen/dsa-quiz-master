@@ -3,15 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
-import { UserProfile } from './UserAuth';
+import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
+import { ProgressSubmission } from './ProgressSubmission';
+import { useState } from 'react';
 
 interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
   onViewProgress: () => void;
   onViewProfile: () => void;
+  onViewAchievements?: () => void;
+  onViewLeaderboard?: () => void;
+  onCodePractice?: () => void;
   currentUser: UserProfile | null;
   completedModules: string[];
   moduleScores: Record<string, number>;
@@ -21,10 +26,14 @@ export function TopicSelection({
   onTopicSelect,
   onViewProgress,
   onViewProfile,
+  onViewAchievements,
+  onViewLeaderboard,
+  onCodePractice,
   currentUser,
   completedModules,
   moduleScores
 }: TopicSelectionProps) {
+  const [showProgressSubmission, setShowProgressSubmission] = useState(false);
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -90,15 +99,15 @@ export function TopicSelection({
         <div className="flex items-center gap-4">
           <Avatar className="w-12 h-12">
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {getInitials(currentUser.displayName)}
+              {currentUser ? getInitials(currentUser.displayName || currentUser.username) : 'U'}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="text-xl font-semibold">Welcome back, {currentUser.displayName}!</h2>
+            <h2 className="text-xl font-semibold">Welcome back, {currentUser?.displayName || currentUser?.username}!</h2>
             <p className="text-muted-foreground">Ready to level up your DSA skills?</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onViewProgress}>
             <TrendingUp size={16} className="mr-2" />
             Progress
@@ -106,6 +115,26 @@ export function TopicSelection({
           <Button variant="outline" size="sm" onClick={onViewProfile}>
             <User size={16} className="mr-2" />
             Profile
+          </Button>
+          {onViewAchievements && (
+            <Button variant="outline" size="sm" onClick={onViewAchievements}>
+              <Award size={16} className="mr-2" />
+              Achievements
+            </Button>
+          )}
+          {onViewLeaderboard && (
+            <Button variant="outline" size="sm" onClick={onViewLeaderboard}>
+              <Trophy size={16} className="mr-2" />
+              Leaderboard
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowProgressSubmission(!showProgressSubmission)}
+          >
+            <Upload size={16} className="mr-2" />
+            Submit Progress
           </Button>
         </div>
       </motion.div>
@@ -264,17 +293,47 @@ export function TopicSelection({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
-        className="text-center pt-8"
+        className="text-center pt-8 space-y-4"
       >
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => onTopicSelect('random')}
-          className="px-8"
-        >
-          🎲 Random Quiz (Mixed Topics)
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => onTopicSelect('random')}
+            className="px-8"
+          >
+            🎲 Random Quiz (Mixed Topics)
+          </Button>
+          {onCodePractice && (
+            <Button
+              variant="default"
+              size="lg"
+              onClick={onCodePractice}
+              className="px-8"
+            >
+              💻 Code Practice (Hands-on)
+            </Button>
+          )}
+        </div>
       </motion.div>
+
+      {/* Progress Submission Modal/Section */}
+      {showProgressSubmission && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="flex justify-center"
+        >
+          <ProgressSubmission
+            onSubmissionComplete={(response) => {
+              if (response.success) {
+                setShowProgressSubmission(false);
+              }
+            }}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }
