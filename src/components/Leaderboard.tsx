@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Trophy, Medal, Crown, Share, Download, Upload, Copy } from 'lucide-react';
-import { UserProfile } from './UserAuth';
+import { UserProfile } from '@/types';
 import { toast } from 'sonner';
 
 interface LeaderboardProps {
@@ -16,6 +16,8 @@ interface LeaderboardProps {
 }
 
 interface UserStats extends UserProfile {
+  totalQuizzes: number;
+  bestOverallScore: number;
   topicProgress: Record<string, {
     completed: number;
     total: number;
@@ -101,7 +103,7 @@ export function Leaderboard({ currentUser, onBack }: LeaderboardProps) {
   };
 
   const getAchievements = (user: UserStats) => {
-    const achievements = [];
+    const achievements: string[] = [];
 
     if (user.bestOverallScore >= 90) achievements.push('Quiz Master');
     if (user.bestOverallScore >= 80) achievements.push('Expert');

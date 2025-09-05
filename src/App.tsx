@@ -1,72 +1,130 @@
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { UserAuth, UserProfile } from '@/components/UserAuth';
+import { useGitHubAuth } from '@/hooks/useGitHubAuth';
+import { useUserProfile, useQuizProgress, useQuizAttempts, useAchievements, useLeaderboard } from '@/hooks/useDatabase';
+import { DatabaseProvider, DatabaseLoader } from '@/components/DatabaseProvider';
+import { DatabaseDebugger } from '@/components/DatabaseDebugger';
+import '@/services/database-utils'; // Import for development utilities
+import '@/services/database-test'; // Import for testing utilities
+import '@/scripts/bootstrap-database'; // Initialize database on app start
+import { UserAuth } from '@/components/UserAuth';
+import { UserProfile, normalizeUserProfile } from '@/types';
 import { TopicSelection } from '@/components/TopicSelection';
 import { ModuleSelection } from '@/components/ModuleSelection';
 import { Quiz } from '@/components/Quiz';
 import { QuizResults } from '@/components/QuizResults';
 import { ProgressTracking } from '@/components/ProgressTracking';
 import { UserProfileComponent } from '@/components/UserProfileComponent';
+import { CodePracticeSelection } from '@/components/CodePracticeSelection';
+import { CodePractice } from '@/components/CodePractice';
+import { AchievementsPage } from '@/components/AchievementsPage';
+import { LeaderboardPage } from '@/components/LeaderboardPage';
+import { FloatingSubmitButton } from '@/components/FloatingSubmitButton';
 import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
+import { CodeExercise } from '@/lib/code-exercises';
+import { achievementService } from '@/services/achievement-service';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
-type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile';
+type AppState = 'auth' | 'topic-selection' | 'module-selection' | 'quiz' | 'results' | 'progress' | 'profile' | 'code-practice-selection' | 'code-practice' | 'achievements' | 'leaderboard';
 
-function App() {
+function AppContent() {
+  const { handleCallback, user: githubUser } = useGitHubAuth();
+  const { profile: currentUser, updateProfile } = useUserProfile();
+  const { progress, saveProgress, getModuleProgress } = useQuizProgress();
+  const { saveAttempt } = useQuizAttempts();
+  const { unlockAchievement } = useAchievements();
+  const { updateUserLeaderboardEntry } = useLeaderboard();
+
   const [appState, setAppState] = useState<AppState>('auth');
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [currentModule, setCurrentModule] = useState<QuizModule | null>(null);
   const [currentTopic, setCurrentTopic] = useState<string>('');
+  const [currentExercise, setCurrentExercise] = useState<CodeExercise | null>(null);
   const [quizScore, setQuizScore] = useState(0);
+  const [questionStartTime, setQuestionStartTime] = useState<Date>(new Date());
 
-  // Check for existing user session on app load
+  // Handle OAuth callback
   useEffect(() => {
-    const savedUser = localStorage.getItem('dsa-quiz-current-user');
-    if (savedUser) {
-      try {
-        const user: UserProfile = JSON.parse(savedUser);
-        setCurrentUser(user);
-        setAppState('topic-selection');
-      } catch (error) {
-        localStorage.removeItem('dsa-quiz-current-user');
-      }
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+
+    if (code && state) {
+      handleCallback(code, state)
+        .then(() => {
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((error) => {
+          console.error('Authentication failed:', error);
+          toast.error('Authentication failed. Please try again.');
+        });
     }
-  }, []);
+  }, [handleCallback]);
 
-  // Use user-specific progress keys
-  const completedModulesKey = currentUser ? `completed-modules-${currentUser.id}` : 'completed-modules';
-  const moduleScoresKey = currentUser ? `module-scores-${currentUser.id}` : 'module-scores';
+  // Set initial state based on user profile
+  useEffect(() => {
+    if (currentUser) {
+      setAppState('topic-selection');
+    } else {
+      setAppState('auth');
+    }
+  }, [currentUser]);
 
-  const [completedModules, setCompletedModules] = useLocalStorage<string[]>(completedModulesKey, []);
-  const [moduleScores, setModuleScores] = useLocalStorage<Record<string, number>>(moduleScoresKey, {});
+  // Helper to get completed modules from progress
+  const getCompletedModules = (): string[] => {
+    const moduleIds = new Set<string>();
+    progress.forEach(p => {
+      if (p.score >= 70) { // Consider 70% as passing
+        moduleIds.add(p.moduleId);
+      }
+    });
+    return Array.from(moduleIds);
+  };
 
+  // Helper to get module scores
+  const getModuleScores = (): Record<string, number> => {
+    const scores: Record<string, number> = {};
+    progress.forEach(p => {
+      const currentScore = scores[p.moduleId] || 0;
+      scores[p.moduleId] = Math.max(currentScore, p.score);
+    });
+    return scores;
+  };
+
+  const completedModules = getCompletedModules();
+  const moduleScores = getModuleScores();
+
+  // These functions are now handled by the database hooks automatically
   const handleLogin = (user: UserProfile) => {
-    setCurrentUser(user);
-    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(user));
-    setAppState('topic-selection');
+    // Database automatically creates user profile through hooks
+    toast.success(`Welcome back, ${user.displayName}! 🎉`);
   };
 
   const handleRegister = (user: UserProfile) => {
-    setCurrentUser(user);
-    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(user));
-    setAppState('topic-selection');
+    // Database automatically creates user profile through hooks
     toast.success('Welcome to DSA Quiz Master! 🎉');
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('dsa-quiz-current-user');
-    setAppState('auth');
-    toast.success('Logged out successfully');
+    // Clear local session data but keep database intact
+    localStorage.removeItem('current-user-id');
+    window.location.reload(); // Reload to reset app state
   };
 
   const handleUpdateProfile = (updatedUser: UserProfile) => {
-    setCurrentUser(updatedUser);
-    localStorage.setItem('dsa-quiz-current-user', JSON.stringify(updatedUser));
+    if (updateProfile) {
+      // Convert dates properly for database storage
+      const updates: Partial<UserProfile> = {
+        ...updatedUser,
+        createdAt: typeof updatedUser.createdAt === 'string'
+          ? new Date(updatedUser.createdAt)
+          : updatedUser.createdAt
+      };
+      updateProfile(updates);
+    }
   };
 
   const handleTopicSelect = (topicId: string) => {
@@ -99,41 +157,97 @@ function App() {
 
     setCurrentModule(module);
     setCurrentQuestions(moduleQuestions);
+    setQuestionStartTime(new Date());
     setAppState('quiz');
   };
 
-  const handleQuizComplete = (score: number, totalQuestions: number) => {
+  const handleQuizComplete = async (score: number, totalQuestions: number, questionAttempts?: Array<{ questionId: string; userAnswer: number; correctAnswer: number; timeSpent: number }>) => {
     setQuizScore(score);
 
     if (currentModule && currentUser) {
       const scorePercentage = Math.round((score / totalQuestions) * 100);
+      const timeSpent = Date.now() - questionStartTime.getTime();
 
-      // Update module completion and score
-      if (!completedModules.includes(currentModule.id)) {
-        setCompletedModules(prev => [...prev, currentModule.id]);
-      }
+      try {
+        // Save quiz progress to database
+        await saveProgress(
+          currentModule.id,
+          currentTopic || currentModule.id.split('-')[0], // Extract topic from module ID
+          scorePercentage,
+          totalQuestions,
+          score,
+          timeSpent
+        );
 
-      // Update best score for this module
-      setModuleScores(prev => ({
-        ...prev,
-        [currentModule.id]: Math.max(prev[currentModule.id] || 0, scorePercentage)
-      }));
+        // Save individual question attempts if provided
+        if (questionAttempts && saveAttempt) {
+          for (const attempt of questionAttempts) {
+            await saveAttempt(
+              currentModule.id,
+              attempt.questionId,
+              attempt.userAnswer,
+              attempt.correctAnswer,
+              attempt.timeSpent
+            );
+          }
+        }
 
-      // Update current user's stats locally
-      if (currentUser) {
-        const updatedUser = {
+        // Update user stats and calculate average score
+        const newTotalQuizzes = currentUser.stats.totalQuizzesTaken + 1;
+        const newTotalScore = currentUser.totalScore + scorePercentage;
+        const newAverageScore = Math.round((currentUser.stats.averageScore * currentUser.stats.totalQuizzesTaken + scorePercentage) / newTotalQuizzes);
+        
+        const updatedProfile = {
           ...currentUser,
-          totalQuizzes: currentUser.totalQuizzes + 1,
-          bestOverallScore: Math.max(currentUser.bestOverallScore, scorePercentage)
+          totalScore: newTotalScore,
+          stats: {
+            ...currentUser.stats,
+            totalQuizzesTaken: newTotalQuizzes,
+            totalTimeSpent: currentUser.stats.totalTimeSpent + timeSpent,
+            averageScore: newAverageScore,
+            lastQuizDate: new Date()
+          }
         };
 
-        setCurrentUser(updatedUser);
-        localStorage.setItem('dsa-quiz-current-user', JSON.stringify(updatedUser));
+        await updateProfile(updatedProfile);
 
-        // Show achievement toast for new best score
+        // Check for achievements
+        try {
+          const unlockedAchievements = await achievementService.checkAndUnlockAchievements(
+            currentUser.id,
+            updatedProfile,
+            progress,
+            {
+              justCompletedQuiz: true,
+              lastQuizScore: scorePercentage,
+              lastQuizTime: timeSpent
+            }
+          );
+
+          if (unlockedAchievements.length > 0) {
+            console.log('New achievements unlocked:', unlockedAchievements);
+          }
+        } catch (error) {
+          console.error('Error checking achievements:', error);
+        }
+
+        // Update leaderboard
+        try {
+          await updateUserLeaderboardEntry(updatedProfile);
+        } catch (error) {
+          console.error('Error updating leaderboard:', error);
+        }
+
+        // Show achievement toast for good scores
         if (scorePercentage >= 80) {
           toast.success(`Great score: ${scorePercentage}%! 🎉`);
+        } else if (scorePercentage >= 60) {
+          toast.success(`Good job: ${scorePercentage}%! Keep practicing! 💪`);
         }
+
+      } catch (error) {
+        console.error('Error saving quiz results:', error);
+        toast.error('Failed to save quiz results');
       }
     }
 
@@ -169,6 +283,34 @@ function App() {
     setAppState('profile');
   };
 
+  const handleCodePractice = () => {
+    setAppState('code-practice-selection');
+  };
+
+  const handleViewAchievements = () => {
+    setAppState('achievements');
+  };
+
+  const handleViewLeaderboard = () => {
+    setAppState('leaderboard');
+  };
+
+  const handleExerciseSelect = (exercise: CodeExercise) => {
+    setCurrentExercise(exercise);
+    setAppState('code-practice');
+  };
+
+  const handleExerciseComplete = () => {
+    toast.success('Exercise completed! Great job! 🎉');
+    setAppState('code-practice-selection');
+    setCurrentExercise(null);
+  };
+
+  const handleBackToCodePractice = () => {
+    setAppState('code-practice-selection');
+    setCurrentExercise(null);
+  };
+
   const getCurrentTopicName = () => {
     if (currentTopic === 'random') return 'Mixed Topics';
     const topic = enhancedQuizTopics.find(t => t.id === currentTopic);
@@ -196,7 +338,10 @@ function App() {
           onTopicSelect={handleTopicSelect}
           onViewProgress={handleViewProgress}
           onViewProfile={handleViewProfile}
-          currentUser={currentUser}
+          onViewAchievements={handleViewAchievements}
+          onViewLeaderboard={handleViewLeaderboard}
+          onCodePractice={handleCodePractice}
+          currentUser={normalizeUserProfile(currentUser)}
           completedModules={completedModules}
           moduleScores={moduleScores}
         />
@@ -240,15 +385,57 @@ function App() {
 
       {appState === 'profile' && currentUser && (
         <UserProfileComponent
-          user={currentUser}
+          user={normalizeUserProfile(currentUser)}
           onBack={handleBackToTopics}
           onLogout={handleLogout}
           onUpdateProfile={handleUpdateProfile}
         />
       )}
 
+      {appState === 'code-practice-selection' && (
+        <CodePracticeSelection
+          onExerciseSelect={handleExerciseSelect}
+          onBack={handleBackToTopics}
+        />
+      )}
+
+      {appState === 'code-practice' && currentExercise && (
+        <CodePractice
+          exercise={currentExercise}
+          onComplete={handleExerciseComplete}
+          onBack={handleBackToCodePractice}
+        />
+      )}
+
+      {appState === 'achievements' && (
+        <AchievementsPage
+          onBack={handleBackToTopics}
+        />
+      )}
+
+      {appState === 'leaderboard' && (
+        <LeaderboardPage
+          onBack={handleBackToTopics}
+          currentUserId={currentUser?.id}
+        />
+      )}
+
       <Toaster />
+      <DatabaseDebugger />
+
+      {/* Floating Submit Button - shows on all pages except auth */}
+      {appState !== 'auth' && <FloatingSubmitButton />}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <DatabaseProvider>
+      <DatabaseLoader>
+        <AppContent />
+      </DatabaseLoader>
+    </DatabaseProvider>
   );
 }
 
