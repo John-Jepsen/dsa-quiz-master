@@ -261,6 +261,130 @@ export const enhancedQuizTopics: QuizTopic[] = [
                 tags: ['algorithms', 'optimization', 'complex']
             }
         ]
+    },
+    {
+        id: 'graphs',
+        name: 'Graphs',
+        description: 'Master graph data structures and algorithms',
+        icon: 'chart-scatter',
+        totalQuestions: 24,
+        modules: [
+            {
+                id: 'graphs-basics',
+                name: 'Graph Fundamentals',
+                description: 'Graph representations, terminology, and basic concepts',
+                difficulty: 'beginner',
+                questionCount: 4,
+                tags: ['basics', 'representation', 'terminology']
+            },
+            {
+                id: 'graph-traversals',
+                name: 'Graph Traversals',
+                description: 'DFS, BFS, topological sorting, and connected components',
+                difficulty: 'intermediate',
+                questionCount: 4,
+                prerequisites: ['graphs-basics'],
+                tags: ['DFS', 'BFS', 'topological', 'traversal']
+            },
+            {
+                id: 'shortest-path',
+                name: 'Shortest Path Algorithms',
+                description: 'Dijkstra, Bellman-Ford, Floyd-Warshall algorithms',
+                difficulty: 'intermediate',
+                questionCount: 4,
+                prerequisites: ['graph-traversals'],
+                tags: ['dijkstra', 'bellman-ford', 'shortest-path']
+            },
+            {
+                id: 'minimum-spanning-tree',
+                name: 'Minimum Spanning Tree',
+                description: 'Kruskal and Prim algorithms for MST problems',
+                difficulty: 'intermediate',
+                questionCount: 4,
+                prerequisites: ['graphs-basics'],
+                tags: ['MST', 'kruskal', 'prim', 'union-find']
+            },
+            {
+                id: 'graph-algorithms',
+                name: 'Advanced Graph Algorithms',
+                description: 'SCC, articulation points, maximum flow',
+                difficulty: 'advanced',
+                questionCount: 4,
+                prerequisites: ['graph-traversals', 'shortest-path'],
+                tags: ['SCC', 'flow', 'articulation', 'advanced']
+            },
+            {
+                id: 'graph-problems',
+                name: 'Complex Graph Problems',
+                description: 'TSP, network flow applications, and optimization',
+                difficulty: 'advanced',
+                questionCount: 4,
+                prerequisites: ['graph-algorithms', 'minimum-spanning-tree'],
+                tags: ['TSP', 'optimization', 'complex', 'applications']
+            }
+        ]
+    },
+    {
+        id: 'sorting',
+        name: 'Sorting',
+        description: 'Master sorting algorithms and their applications',
+        icon: 'bars-arrow-up',
+        totalQuestions: 21,
+        modules: [
+            {
+                id: 'sorting-basics',
+                name: 'Sorting Fundamentals',
+                description: 'Sorting concepts, stability, and algorithm categories',
+                difficulty: 'beginner',
+                questionCount: 3,
+                tags: ['basics', 'stability', 'concepts']
+            },
+            {
+                id: 'simple-sorting',
+                name: 'Simple Sorting Algorithms',
+                description: 'Bubble sort, selection sort, insertion sort',
+                difficulty: 'beginner',
+                questionCount: 3,
+                prerequisites: ['sorting-basics'],
+                tags: ['bubble', 'selection', 'insertion', 'simple']
+            },
+            {
+                id: 'efficient-sorting',
+                name: 'Efficient Sorting Algorithms',
+                description: 'Merge sort, quick sort, heap sort',
+                difficulty: 'intermediate',
+                questionCount: 4,
+                prerequisites: ['simple-sorting'],
+                tags: ['merge', 'quick', 'heap', 'efficient']
+            },
+            {
+                id: 'non-comparison-sorting',
+                name: 'Non-Comparison Sorting',
+                description: 'Counting sort, radix sort, bucket sort',
+                difficulty: 'intermediate',
+                questionCount: 4,
+                prerequisites: ['sorting-basics'],
+                tags: ['counting', 'radix', 'bucket', 'non-comparison']
+            },
+            {
+                id: 'advanced-sorting',
+                name: 'Advanced Sorting Techniques',
+                description: 'External sorting, parallel sorting, adaptive techniques',
+                difficulty: 'advanced',
+                questionCount: 4,
+                prerequisites: ['efficient-sorting', 'non-comparison-sorting'],
+                tags: ['external', 'parallel', 'adaptive', 'advanced']
+            },
+            {
+                id: 'sorting-applications',
+                name: 'Sorting Applications',
+                description: 'Partial sorting, selection algorithms, real-world uses',
+                difficulty: 'intermediate',
+                questionCount: 3,
+                prerequisites: ['efficient-sorting'],
+                tags: ['applications', 'selection', 'partial', 'practical']
+            }
+        ]
     }
 ];
 
