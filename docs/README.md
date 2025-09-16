@@ -40,3 +40,5 @@ An interactive Data Structures and Algorithms quiz app built with React, TypeScr
 - See `docs/database.md` for database details
 - See `docs/prd.md` for product requirements
 - See `docs/github-auth.md` for GitHub OAuth setup
+- See `docs/github-issues-list.md` for pre-defined GitHub issues
+- See `docs/issue-management-guide.md` for issue management workflow
