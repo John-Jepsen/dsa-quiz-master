@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
@@ -37,11 +36,12 @@ export function TopicSelection({
 }: TopicSelectionProps) {
   const [showProgressSubmission, setShowProgressSubmission] = useState(false);
   const [riddleState, setRiddleState] = useState<'idle' | 'hint' | 'answer'>('idle');
-  const [guess, setGuess] = useState('');
-  const [guessCount, setGuessCount] = useState(0);
+  const [bits, setBits] = useState([0, 0, 0, 0, 0]);
+  const [attempts, setAttempts] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [correctGuessed, setCorrectGuessed] = useState(false);
+  const [puzzleSolved, setPuzzleSolved] = useState(false);
 
+  const targetPattern = [1, 0, 1, 1, 0];
   const clues = [
     'It is icy and digital—two words.',
     'The storm is made of 1s and 0s.',
@@ -226,83 +226,78 @@ export function TopicSelection({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-lg border bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm"
+        className="rounded-lg border bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 p-4 flex flex-col md:flex-row md:items-start md:justify-between gap-3 shadow-sm"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <div className="p-2 rounded-full bg-background shadow-inner">
             <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <p className="font-semibold text-foreground">Holiday coding riddle (2 steps)</p>
+            <p className="font-semibold text-foreground">Holiday coding puzzle</p>
             <p className="text-sm text-muted-foreground">
-              What do snowbound coders call a storm of 1s and 0s?
+              What do snowbound coders call a storm of 1s and 0s? Flip the bits to match the secret pattern.
             </p>
-            {riddleState === 'hint' && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Hint: think wintry weather and how bits blow around.
-              </p>
-            )}
             {riddleState === 'answer' && (
               <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              Guesses: {guessCount}/5 • {Math.max(0, 5 - guessCount)} left before reveal
-            </p>
-            {correctGuessed && riddleState !== 'answer' && (
-              <p className="text-xs text-primary mt-1">
-                You&apos;re onto it—finish your guesses to unlock the reveal.
-              </p>
             )}
             {feedback && <p className="text-xs text-muted-foreground mt-1">{feedback}</p>}
           </div>
         </div>
-        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
-          <Input
-            placeholder="Your guess"
-            value={guess}
-            onChange={(e) => setGuess(e.target.value)}
-            className="md:min-w-[220px]"
-          />
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-3 w-full">
+          <div className="grid grid-cols-5 gap-2">
+            {bits.map((bit, idx) => (
+              <Button
+                key={idx}
+                variant={puzzleSolved ? 'outline' : bit === targetPattern[idx] ? 'default' : 'secondary'}
+                className="h-12 w-full font-semibold"
+                onClick={() => {
+                  if (puzzleSolved) return;
+                  const nextBits = bits.map((b, i) => (i === idx ? (b === 1 ? 0 : 1) : b));
+                  const nextAttempts = attempts + 1;
+                  setBits(nextBits);
+                  setAttempts(nextAttempts);
+
+                  const isMatch = nextBits.every((b, i) => b === targetPattern[i]);
+                  if (isMatch) {
+                    setPuzzleSolved(true);
+                    setRiddleState('answer');
+                    setFeedback('You matched the pattern—Binary Blizard!');
+                    return;
+                  }
+
+                  const clue = clues[Math.min(nextAttempts - 1, clues.length - 1)];
+                  setRiddleState('hint');
+                  setFeedback(`${clue}`);
+                }}
+              >
+                {bit}
+              </Button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
             <Button
+              size="sm"
               variant="outline"
               onClick={() => {
-                const trimmed = guess.trim();
-                if (!trimmed) return;
-
-                const normalized = trimmed.toLowerCase().replace(/\s+/g, ' ').trim();
-                const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
-                const nextCount = guessCount + 1;
-                setGuessCount(nextCount);
-                setGuess('');
-
-                if (isCorrect) {
-                  setCorrectGuessed(true);
-                }
-
-                if (nextCount >= 3 && riddleState === 'idle') {
-                  setRiddleState('hint');
-                }
-
-                if (isCorrect) {
-                  setRiddleState('answer');
-                  setFeedback('Exactly—revealing now.');
-                } else {
-                  const clue = clues[Math.min(nextCount - 1, clues.length - 1)];
-                  const triesLeft = Math.max(0, 5 - nextCount);
-                  const extra = triesLeft > 0 ? ` ${triesLeft} more before reveal unlocks.` : ' Reveal is available.';
-                  setFeedback(`${clue}${extra}`);
-                }
+                setBits([0, 0, 0, 0, 0]);
+                setAttempts(0);
+                setFeedback(null);
+                setPuzzleSolved(false);
+                setRiddleState('idle');
               }}
             >
-              Submit guess
+              Reset puzzle
             </Button>
             <Button
+              size="sm"
               variant={riddleState === 'answer' ? 'outline' : 'default'}
-              disabled={riddleState !== 'answer' && guessCount < 5}
-              onClick={() => setRiddleState('answer')}
+              onClick={() => {
+                setPuzzleSolved(true);
+                setRiddleState('answer');
+                setFeedback('Revealed: Binary Blizard');
+              }}
             >
-              {riddleState === 'answer' ? 'Solved!' : guessCount < 5 ? 'Reveal (after 5 guesses)' : 'Reveal answer'}
+              {riddleState === 'answer' ? 'Solved!' : 'Reveal answer'}
             </Button>
           </div>
         </div>
