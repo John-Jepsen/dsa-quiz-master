@@ -18,9 +18,17 @@ interface UserProfileComponentProps {
 }
 
 export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }: UserProfileComponentProps) {
+  // Derive safe values so missing fields do not break rendering.
+  const displayName = user.displayName || user.username;
+  const email = user.email || 'Not set';
+  const totalQuizzes = user.totalQuizzes ?? user.stats?.totalQuizzesTaken ?? 0;
+  const bestOverallScore = Math.round(
+    user.bestOverallScore ?? user.stats?.averageScore ?? user.totalScore ?? 0
+  );
+
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    displayName: user.displayName || user.username || '',
+    displayName: displayName || '',
     email: user.email || ''
   });
 
@@ -61,11 +69,9 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
 
   const getAchievementBadges = () => {
     const badges: Array<{ text: string; color: string }> = [];
-    const bestScore = user.bestOverallScore || 0;
-    const totalQuizzes = user.totalQuizzes || 0;
 
-    if (bestScore >= 90) badges.push({ text: 'Quiz Master', color: 'bg-yellow-500' });
-    if (bestScore >= 80) badges.push({ text: 'Expert', color: 'bg-blue-500' });
+    if (bestOverallScore >= 90) badges.push({ text: 'Quiz Master', color: 'bg-yellow-500' });
+    if (bestOverallScore >= 80) badges.push({ text: 'Expert', color: 'bg-blue-500' });
     if (totalQuizzes >= 20) badges.push({ text: 'Dedicated', color: 'bg-purple-500' });
     if (totalQuizzes >= 10) badges.push({ text: 'Enthusiast', color: 'bg-green-500' });
 
@@ -73,7 +79,9 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
   };
 
   const formatDate = (dateInput: string | Date) => {
+    if (!dateInput) return 'Unknown';
     const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    if (Number.isNaN(date.getTime())) return 'Unknown';
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -110,11 +118,11 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
                 <div className="flex items-center gap-4">
                   <Avatar className="w-16 h-16">
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
-                      {getInitials(user.displayName || user.username)}
+                      {getInitials(displayName)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground">{user.displayName}</h2>
+                    <h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
                     <p className="text-muted-foreground">@{user.username}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -192,11 +200,11 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
             <CardContent>
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-3xl font-bold text-primary">{user.totalQuizzes}</div>
+                  <div className="text-3xl font-bold text-primary">{totalQuizzes}</div>
                   <div className="text-sm text-muted-foreground mt-1">Total Quizzes</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-3xl font-bold text-accent">{user.bestOverallScore}%</div>
+                  <div className="text-3xl font-bold text-accent">{bestOverallScore}%</div>
                   <div className="text-sm text-muted-foreground mt-1">Best Average</div>
                 </div>
               </div>
@@ -239,7 +247,7 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
                 <Mail className="w-5 h-5 text-muted-foreground" />
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">

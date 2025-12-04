@@ -1,42 +1,15 @@
-# 🧠 DSA Quiz Master
+# DSA Quiz Master
 
-An interactive Data Structures and Algorithms quiz app built with React, TypeScript, and Vite. Test your knowledge across DSA topics with real-time progress tracking and leaderboards.
+A lean DSA quiz playground. The repo surface stays quiet; details live in `docs/`.
 
-## Features
-- Multi-topic quizzes (arrays, trees, graphs, etc.)
-- User authentication & profiles
-- Persistent data with IndexedDB
-- Real-time progress & leaderboards
-- Responsive, modern UI (Tailwind CSS, Radix UI)
-- Offline support
+## Quickstart
+- `npm install`
+- `npm run dev` for local play
+- `npm run build` for production
+- `npm test` for Vitest + React Testing Library
+- `npm run lint` to enforce style
 
-## Tech Stack
-- React 19, TypeScript, Vite
-- IndexedDB (browser-based)
-- Tailwind CSS, Radix UI
-- GitHub Pages deployment
-
-## Getting Started
-1. Clone the repo & install dependencies:
-   ```bash
-   git clone https://github.com/John-Jepsen/dsa-quiz-master.git
-   cd dsa-quiz-master
-   npm install
-   ```
-2. Start the dev server:
-   ```bash
-   npm run dev
-   ```
-3. Open [http://localhost:5173](http://localhost:5173)
-
-## Scripts
-- `npm run dev` — Start dev server
-- `npm run build` — Build for production
-- `npm run preview` — Preview production build
-- `npm run lint` — Run ESLint
-
-## More
-- See `docs/deployment.md` for deployment
-- See `docs/database.md` for database details
-- See `docs/prd.md` for product requirements
-- See `docs/github-auth.md` for GitHub OAuth setup
+## Notes
+- Profiles, quizzes, and leaderboards run fully in-browser (IndexedDB).
+- Deploy via GitHub Pages; see `docs/deployment.md` when you need the steps.
+- Architecture, auth, and data guides sit in the rest of the `docs/` folder for when the mystery needs lifting.
