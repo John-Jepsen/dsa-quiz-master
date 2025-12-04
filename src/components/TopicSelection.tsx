@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
@@ -35,7 +36,11 @@ export function TopicSelection({
   moduleScores
 }: TopicSelectionProps) {
   const [showProgressSubmission, setShowProgressSubmission] = useState(false);
-  const [showRiddleAnswer, setShowRiddleAnswer] = useState(false);
+  const [riddleState, setRiddleState] = useState<'idle' | 'hint' | 'answer'>('idle');
+  const [guess, setGuess] = useState('');
+  const [guessCount, setGuessCount] = useState(0);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [correctGuessed, setCorrectGuessed] = useState(false);
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -220,22 +225,78 @@ export function TopicSelection({
             <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <p className="font-semibold text-foreground">Holiday coding riddle (1-click)</p>
+            <p className="font-semibold text-foreground">Holiday coding riddle (2 steps)</p>
             <p className="text-sm text-muted-foreground">
               What do snowbound coders call a storm of 1s and 0s?
             </p>
-            {showRiddleAnswer && (
+            {riddleState === 'hint' && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Hint: think wintry weather and how bits blow around.
+              </p>
+            )}
+            {riddleState === 'answer' && (
               <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
             )}
+            <p className="text-xs text-muted-foreground mt-1">
+              Guesses: {guessCount}/5 • {Math.max(0, 5 - guessCount)} left before reveal
+            </p>
+            {correctGuessed && riddleState !== 'answer' && (
+              <p className="text-xs text-primary mt-1">
+                You&apos;re onto it—finish your guesses to unlock the reveal.
+              </p>
+            )}
+            {feedback && <p className="text-xs text-muted-foreground mt-1">{feedback}</p>}
           </div>
         </div>
-        <Button
-          variant={showRiddleAnswer ? 'outline' : 'default'}
-          onClick={() => setShowRiddleAnswer(true)}
-          className="md:min-w-[200px]"
-        >
-          {showRiddleAnswer ? 'Solved!' : 'Reveal Answer'}
-        </Button>
+        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
+          <Input
+            placeholder="Your guess"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+            className="md:min-w-[220px]"
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const trimmed = guess.trim();
+                if (!trimmed) return;
+
+                const normalized = trimmed.toLowerCase().replace(/\s+/g, ' ').trim();
+                const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
+                const nextCount = guessCount + 1;
+                setGuessCount(nextCount);
+                setGuess('');
+
+                if (isCorrect) {
+                  setCorrectGuessed(true);
+                }
+
+                if (nextCount >= 3 && riddleState === 'idle') {
+                  setRiddleState('hint');
+                }
+
+                if (isCorrect) {
+                  setRiddleState('answer');
+                  setFeedback('Exactly—revealing now.');
+                } else if (nextCount < 5) {
+                  setFeedback(`Keep guessing. ${5 - nextCount} more before reveal unlocks.`);
+                } else {
+                  setFeedback('You have enough attempts—hit reveal when ready.');
+                }
+              }}
+            >
+              Submit guess
+            </Button>
+            <Button
+              variant={riddleState === 'answer' ? 'outline' : 'default'}
+              disabled={riddleState !== 'answer' && guessCount < 5}
+              onClick={() => setRiddleState('answer')}
+            >
+              {riddleState === 'answer' ? 'Solved!' : guessCount < 5 ? 'Reveal (after 5 guesses)' : 'Reveal answer'}
+            </Button>
+          </div>
+        </div>
       </motion.div>
 
       <div className="flex justify-between items-center">
