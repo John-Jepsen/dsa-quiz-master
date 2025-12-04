@@ -36,18 +36,18 @@ export function TopicSelection({
 }: TopicSelectionProps) {
   const [showProgressSubmission, setShowProgressSubmission] = useState(false);
   const [riddleState, setRiddleState] = useState<'idle' | 'hint' | 'answer'>('idle');
-  const [bits, setBits] = useState([0, 0, 0, 0, 0]);
-  const [attempts, setAttempts] = useState(0);
+  const [firstWord, setFirstWord] = useState<string | null>(null);
+  const [secondWord, setSecondWord] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [puzzleSolved, setPuzzleSolved] = useState(false);
 
-  const targetPattern = [1, 0, 1, 1, 0];
+  const wordOptionsOne = ['Binary', 'Bitwise', 'Snowy'];
+  const wordOptionsTwo = ['Blizard', 'Breeze', 'Bugstorm'];
   const clues = [
     'It is icy and digital—two words.',
-    'The storm is made of 1s and 0s.',
-    'Weather term starts with a B.',
     'Both words start with B.',
-    'Think frosty bits swirling around.'
+    'The weather word is not a breeze.',
+    'If you think winter and bits, you’re close.'
   ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -235,7 +235,7 @@ export function TopicSelection({
           <div>
             <p className="font-semibold text-foreground">Holiday coding puzzle</p>
             <p className="text-sm text-muted-foreground">
-              What do snowbound coders call a storm of 1s and 0s? Flip the bits to match the secret pattern.
+              What do snowbound coders call a storm of 1s and 0s? Pick the two words to name it.
             </p>
             {riddleState === 'answer' && (
               <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
@@ -244,49 +244,81 @@ export function TopicSelection({
           </div>
         </div>
         <div className="flex flex-col gap-3 w-full">
-          <div className="grid grid-cols-5 gap-2">
-            {bits.map((bit, idx) => (
-              <Button
-                key={idx}
-                variant={puzzleSolved ? 'outline' : bit === targetPattern[idx] ? 'default' : 'secondary'}
-                className="h-12 w-full font-semibold"
-                onClick={() => {
-                  if (puzzleSolved) return;
-                  const nextBits = bits.map((b, i) => (i === idx ? (b === 1 ? 0 : 1) : b));
-                  const nextAttempts = attempts + 1;
-                  setBits(nextBits);
-                  setAttempts(nextAttempts);
-
-                  const isMatch = nextBits.every((b, i) => b === targetPattern[i]);
-                  if (isMatch) {
-                    setPuzzleSolved(true);
-                    setRiddleState('answer');
-                    setFeedback('You matched the pattern—Binary Blizard!');
-                    return;
-                  }
-
-                  const clue = clues[Math.min(nextAttempts - 1, clues.length - 1)];
-                  setRiddleState('hint');
-                  setFeedback(`${clue}`);
-                }}
-              >
-                {bit}
-              </Button>
-            ))}
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium text-foreground">Pick word 1</p>
+            <div className="flex flex-wrap gap-2">
+              {wordOptionsOne.map((word) => (
+                <Button
+                  key={word}
+                  variant={firstWord === word ? 'default' : 'outline'}
+                  onClick={() => {
+                    const nextWord = firstWord === word ? null : word;
+                    setFirstWord(nextWord);
+                    setFeedback(null);
+                    setPuzzleSolved(false);
+                    if (riddleState !== 'idle') setRiddleState('idle');
+                  }}
+                >
+                  {word}
+                </Button>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium text-foreground">Pick word 2</p>
+            <div className="flex flex-wrap gap-2">
+              {wordOptionsTwo.map((word) => (
+                <Button
+                  key={word}
+                  variant={secondWord === word ? 'default' : 'outline'}
+                  onClick={() => {
+                    const nextWord = secondWord === word ? null : word;
+                    setSecondWord(nextWord);
+                    setFeedback(null);
+                    setPuzzleSolved(false);
+                    if (riddleState !== 'idle') setRiddleState('idle');
+                  }}
+                >
+                  {word}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <Button
+              variant={puzzleSolved ? 'outline' : 'default'}
+              onClick={() => {
+                if (!firstWord || !secondWord) {
+                  setFeedback('Pick both words first.');
+                  return;
+                }
+                const normalized = `${firstWord} ${secondWord}`.toLowerCase();
+                const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
+                if (isCorrect) {
+                  setPuzzleSolved(true);
+                  setRiddleState('answer');
+                  setFeedback('Nice—Binary Blizard!');
+                } else {
+                  const clue = clues[Math.min((firstWord ? 1 : 0) + (secondWord ? 1 : 0), clues.length - 1)];
+                  setFeedback(`Close. ${clue}`);
+                  setRiddleState('hint');
+                }
+              }}
+            >
+              {puzzleSolved ? 'Solved!' : 'Check answer'}
+            </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => {
-                setBits([0, 0, 0, 0, 0]);
-                setAttempts(0);
+                setFirstWord(null);
+                setSecondWord(null);
                 setFeedback(null);
                 setPuzzleSolved(false);
                 setRiddleState('idle');
               }}
             >
-              Reset puzzle
+              Reset
             </Button>
             <Button
               size="sm"
