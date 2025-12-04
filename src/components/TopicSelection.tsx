@@ -9,6 +9,7 @@ import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 import { ProgressSubmission } from './ProgressSubmission';
 import { useState } from 'react';
+import { Sparkles } from 'lucide-react';
 
 interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
@@ -34,6 +35,7 @@ export function TopicSelection({
   moduleScores
 }: TopicSelectionProps) {
   const [showProgressSubmission, setShowProgressSubmission] = useState(false);
+  const [showRiddleAnswer, setShowRiddleAnswer] = useState(false);
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -205,6 +207,35 @@ export function TopicSelection({
             </div>
           </CardContent>
         </Card>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="rounded-lg border bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm"
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-full bg-background shadow-inner">
+            <Sparkles className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="font-semibold text-foreground">Holiday coding riddle (1-click)</p>
+            <p className="text-sm text-muted-foreground">
+              What do snowbound coders call a storm of 1s and 0s?
+            </p>
+            {showRiddleAnswer && (
+              <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
+            )}
+          </div>
+        </div>
+        <Button
+          variant={showRiddleAnswer ? 'outline' : 'default'}
+          onClick={() => setShowRiddleAnswer(true)}
+          className="md:min-w-[200px]"
+        >
+          {showRiddleAnswer ? 'Solved!' : 'Reveal Answer'}
+        </Button>
       </motion.div>
 
       <div className="flex justify-between items-center">
