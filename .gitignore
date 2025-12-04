@@ -29,3 +29,6 @@ dist-ssr
 packages
 .file-manifest
 .devcontainer/
+# Local-only design config
+components.json
+theme.json

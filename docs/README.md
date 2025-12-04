@@ -1,4 +1,5 @@
 # DSA Quiz Master
+![DSA Quiz Master UI](../Screenshot%202025-12-04%20at%2014.29.33.png)
 
 A lean DSA quiz playground. The repo surface stays quiet; details live in `docs/`.
 
