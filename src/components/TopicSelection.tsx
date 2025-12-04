@@ -41,6 +41,14 @@ export function TopicSelection({
   const [guessCount, setGuessCount] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [correctGuessed, setCorrectGuessed] = useState(false);
+
+  const clues = [
+    'It is icy and digital—two words.',
+    'The storm is made of 1s and 0s.',
+    'Weather term starts with a B.',
+    'Both words start with B.',
+    'Think frosty bits swirling around.'
+  ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -279,10 +287,11 @@ export function TopicSelection({
                 if (isCorrect) {
                   setRiddleState('answer');
                   setFeedback('Exactly—revealing now.');
-                } else if (nextCount < 5) {
-                  setFeedback(`Keep guessing. ${5 - nextCount} more before reveal unlocks.`);
                 } else {
-                  setFeedback('You have enough attempts—hit reveal when ready.');
+                  const clue = clues[Math.min(nextCount - 1, clues.length - 1)];
+                  const triesLeft = Math.max(0, 5 - nextCount);
+                  const extra = triesLeft > 0 ? ` ${triesLeft} more before reveal unlocks.` : ' Reveal is available.';
+                  setFeedback(`${clue}${extra}`);
                 }
               }}
             >
