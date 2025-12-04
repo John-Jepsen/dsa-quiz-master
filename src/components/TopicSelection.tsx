@@ -40,6 +40,7 @@ export function TopicSelection({
   const [secondWord, setSecondWord] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [puzzleSolved, setPuzzleSolved] = useState(false);
+  const [attempts, setAttempts] = useState(0);
 
   const wordOptionsOne = ['Binary', 'Bitwise', 'Snowy'];
   const wordOptionsTwo = ['Blizard', 'Breeze', 'Bugstorm'];
@@ -240,6 +241,9 @@ export function TopicSelection({
             {riddleState === 'answer' && (
               <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
             )}
+            <p className="text-xs text-muted-foreground mt-1">
+              Attempts: {attempts} / 5 before reveal unlocks
+            </p>
             {feedback && <p className="text-xs text-muted-foreground mt-1">{feedback}</p>}
           </div>
         </div>
@@ -292,15 +296,25 @@ export function TopicSelection({
                   setFeedback('Pick both words first.');
                   return;
                 }
+                const nextAttempts = attempts + 1;
+                setAttempts(nextAttempts);
+
                 const normalized = `${firstWord} ${secondWord}`.toLowerCase();
                 const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
-                if (isCorrect) {
+                if (isCorrect && nextAttempts >= 5) {
                   setPuzzleSolved(true);
                   setRiddleState('answer');
                   setFeedback('Nice—Binary Blizard!');
+                } else if (isCorrect) {
+                  const remaining = Math.max(0, 5 - nextAttempts);
+                  setFeedback(`That fits. Try ${remaining} more time(s) to unlock the reveal.`);
+                  setRiddleState('hint');
                 } else {
-                  const clue = clues[Math.min((firstWord ? 1 : 0) + (secondWord ? 1 : 0), clues.length - 1)];
-                  setFeedback(`Close. ${clue}`);
+                  const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
+                  const clue = clues[clueIndex];
+                  const remaining = Math.max(0, 5 - nextAttempts);
+                  const extra = remaining > 0 ? ` ${remaining} more before reveal unlocks.` : ' You can reveal now.';
+                  setFeedback(`Close. ${clue}${extra}`);
                   setRiddleState('hint');
                 }
               }}
@@ -316,6 +330,7 @@ export function TopicSelection({
                 setFeedback(null);
                 setPuzzleSolved(false);
                 setRiddleState('idle');
+                setAttempts(0);
               }}
             >
               Reset
@@ -323,13 +338,18 @@ export function TopicSelection({
             <Button
               size="sm"
               variant={riddleState === 'answer' ? 'outline' : 'default'}
+              disabled={!puzzleSolved && attempts < 5}
               onClick={() => {
-                setPuzzleSolved(true);
-                setRiddleState('answer');
-                setFeedback('Revealed: Binary Blizard');
+                if (puzzleSolved || attempts >= 5) {
+                  setPuzzleSolved(true);
+                  setRiddleState('answer');
+                  setFeedback('Revealed: Binary Blizard');
+                } else {
+                  setFeedback(`Make ${5 - attempts} more attempt(s) before revealing.`);
+                }
               }}
             >
-              {riddleState === 'answer' ? 'Solved!' : 'Reveal answer'}
+              {riddleState === 'answer' ? 'Solved!' : attempts < 5 ? 'Reveal after 5 attempts' : 'Reveal answer'}
             </Button>
           </div>
         </div>
