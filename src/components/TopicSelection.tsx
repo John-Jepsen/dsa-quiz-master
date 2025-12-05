@@ -289,38 +289,40 @@ export function TopicSelection({
             </div>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <Button
-              variant={puzzleSolved ? 'outline' : 'default'}
-              onClick={() => {
-                if (!firstWord || !secondWord) {
-                  setFeedback('Pick both words first.');
-                  return;
-                }
-                const nextAttempts = attempts + 1;
-                setAttempts(nextAttempts);
+            {puzzleSolved ? (
+              <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-red-500/80 via-amber-400/80 to-emerald-500/80 text-white font-extrabold uppercase tracking-wide shadow-lg flex items-center gap-2">
+                ❄️ Binary Blizard 🎄
+              </div>
+            ) : (
+              <Button
+                variant="default"
+                onClick={() => {
+                  if (!firstWord || !secondWord) {
+                    setFeedback('Pick both words first.');
+                    return;
+                  }
+                  const nextAttempts = attempts + 1;
+                  setAttempts(nextAttempts);
 
-                const normalized = `${firstWord} ${secondWord}`.toLowerCase();
-                const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
-                if (isCorrect && nextAttempts >= 5) {
-                  setPuzzleSolved(true);
-                  setRiddleState('answer');
-                  setFeedback('Nice—Binary Blizard!');
-                } else if (isCorrect) {
-                  const remaining = Math.max(0, 5 - nextAttempts);
-                  setFeedback(`Correct! ${remaining} more attempt(s) before reveal unlocks.`);
-                  setRiddleState('hint');
-                } else {
-                  const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
-                  const clue = clues[clueIndex];
-                  const remaining = Math.max(0, 5 - nextAttempts);
-                  const extra = remaining > 0 ? ` ${remaining} more before reveal unlocks.` : ' You can reveal now.';
-                  setFeedback(`Close. ${clue}${extra}`);
-                  setRiddleState('hint');
-                }
-              }}
-            >
-              {puzzleSolved ? 'Solved!' : 'Check answer'}
-            </Button>
+                  const normalized = `${firstWord} ${secondWord}`.toLowerCase();
+                  const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
+                  if (isCorrect) {
+                    setPuzzleSolved(true);
+                    setRiddleState('answer');
+                    setFeedback('Binary Blizard unlocked! 🎄');
+                  } else {
+                    const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
+                    const clue = clues[clueIndex];
+                    const remaining = Math.max(0, 5 - nextAttempts);
+                    const extra = remaining > 0 ? ` ${remaining} more before reveal unlocks.` : ' You can reveal now.';
+                    setFeedback(`Close. ${clue}${extra}`);
+                    setRiddleState('hint');
+                  }
+                }}
+              >
+                Check answer
+              </Button>
+            )}
             <Button
               size="sm"
               variant="outline"
