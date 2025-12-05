@@ -307,7 +307,7 @@ export function TopicSelection({
                   setFeedback('Nice—Binary Blizard!');
                 } else if (isCorrect) {
                   const remaining = Math.max(0, 5 - nextAttempts);
-                  setFeedback(`That fits. Try ${remaining} more time(s) to unlock the reveal.`);
+                  setFeedback(`Correct! ${remaining} more attempt(s) before reveal unlocks.`);
                   setRiddleState('hint');
                 } else {
                   const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
