@@ -250,15 +250,6 @@ export function TopicSelection({
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <p className={`font-semibold ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Holiday coding puzzle</p>
-              {blizzardActive && (
-                <motion.span
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="px-2 py-1 text-[10px] uppercase tracking-[0.28em] rounded-full bg-white/15 text-white border border-white/25 shadow"
-                >
-                  Binary Blizard
-                </motion.span>
-              )}
             </div>
             <p className={`text-sm ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
               What do snowbound coders call a storm of 1s and 0s? Pick the two words to name it.
@@ -266,20 +257,22 @@ export function TopicSelection({
 
             {blizzardActive && (
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
+                initial={{ scale: 0.97, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                className="mt-1 flex items-center gap-3 rounded-lg border border-white/20 bg-white/10 px-3 py-2 shadow-lg backdrop-blur"
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                className="mt-3 w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl backdrop-blur"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 border border-white/30 text-white">
-                  <Snowflake className="h-6 w-6" />
+                <div className="flex items-center gap-4 text-white">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/15 border border-white/25">
+                    <Snowflake className="h-8 w-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[11px] uppercase tracking-[0.35em] text-white/80">The Secret Word is</p>
+                    <p className="text-2xl font-extrabold leading-tight">Binary Blizzard</p>
+                    <p className="text-sm text-white/75">You unlocked the storm—share the win!</p>
+                  </div>
                 </div>
-                <div className="space-y-0.5 text-white">
-                  <p className="text-[10px] uppercase tracking-[0.32em] text-white/80">Binary Blizard</p>
-                  <p className="text-lg font-extrabold leading-tight">Blizzard unleashed</p>
-                  <p className="text-xs text-white/80">A storm of 1s and 0s just swept the quiz.</p>
-                </div>
-                <PartyPopper className="h-8 w-8 text-white drop-shadow" />
+                <PartyPopper className="h-10 w-10 text-white drop-shadow" />
               </motion.div>
             )}
 
@@ -345,11 +338,17 @@ export function TopicSelection({
               <motion.div
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="relative w-full md:w-auto overflow-hidden px-4 py-3 rounded-lg bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400 text-white font-extrabold uppercase tracking-wide shadow-xl flex items-center gap-3 ring-2 ring-white/30"
+                className="relative w-full overflow-hidden px-5 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400 text-white shadow-xl ring-2 ring-white/40"
               >
-                <Snowflake className="h-6 w-6 drop-shadow" />
-                <span className="text-sm">Binary Blizard</span>
-                <span className="text-lg">Unleashed!</span>
+                <div className="flex items-center gap-4">
+                  <Snowflake className="h-8 w-8 drop-shadow" />
+                  <div className="space-y-1">
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/80">The Secret Word is</p>
+                    <p className="text-2xl font-black leading-tight">Binary Blizzard</p>
+                    <p className="text-sm text-white/85">You cracked the holiday riddle.</p>
+                  </div>
+                  <PartyPopper className="h-7 w-7 drop-shadow" />
+                </div>
               </motion.div>
             ) : (
               <Button
@@ -367,7 +366,7 @@ export function TopicSelection({
                   if (isCorrect) {
                     setPuzzleSolved(true);
                     setRiddleState('answer');
-                    setFeedback('Binary Blizard unleashed! ❄️🎉');
+                    setFeedback('The secret word is Binary Blizzard! ❄️🎉');
                   } else {
                     const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
                     const clue = clues[clueIndex];
@@ -403,7 +402,7 @@ export function TopicSelection({
                 if (puzzleSolved || attempts >= 5) {
                   setPuzzleSolved(true);
                   setRiddleState('answer');
-                  setFeedback('Revealed: Binary Blizard — the storm is official. ❄️');
+                  setFeedback('Revealed: The secret word is Binary Blizzard. ❄️');
                 } else {
                   setFeedback(`Make ${5 - attempts} more attempt(s) before revealing.`);
                 }
