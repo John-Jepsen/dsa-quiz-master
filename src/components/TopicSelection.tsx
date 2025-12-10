@@ -51,6 +51,12 @@ export function TopicSelection({
     'The weather word is not a breeze.',
     'If you think winter and bits, you’re close.'
   ];
+  const flyoverItems = [
+    { icon: '✈️', top: '12%', delay: 0, duration: 12 },
+    { icon: '🛩️', top: '58%', delay: 2.5, duration: 14 },
+    { icon: '💻', top: '32%', delay: 1.2, duration: 16 },
+    { icon: '🖥️', top: '78%', delay: 3.2, duration: 18 },
+  ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -228,7 +234,7 @@ export function TopicSelection({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className={`relative overflow-hidden rounded-lg border p-4 flex flex-col md:flex-row md:items-start md:justify-between gap-3 ${
+        className={`relative overflow-hidden rounded-lg border p-4 grid gap-4 md:grid-cols-2 md:items-start ${
           blizzardActive
             ? 'border-sky-300/80 bg-gradient-to-br from-slate-900 via-sky-900/80 to-cyan-800/80 shadow-2xl shadow-sky-500/30 ring-2 ring-cyan-300/60'
             : 'bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 shadow-sm'
@@ -238,7 +244,44 @@ export function TopicSelection({
           <>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_40%)]" />
+            <div className="pointer-events-none absolute inset-0">
+              {flyoverItems.map((item, index) => (
+                <motion.span
+                  key={`${item.icon}-${index}`}
+                  className="absolute text-3xl md:text-4xl drop-shadow-lg"
+                  style={{ top: item.top }}
+                  initial={{ x: '-15%', rotate: -5, opacity: 0 }}
+                  animate={{ x: '115%', rotate: 6, opacity: [0, 1, 1, 0] }}
+                  transition={{ duration: item.duration, delay: item.delay, repeat: Infinity, ease: 'linear' }}
+                >
+                  {item.icon}
+                </motion.span>
+              ))}
+            </div>
           </>
+        )}
+
+        {blizzardActive && (
+          <motion.div
+            initial={{ scale: 0.97, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+            className="relative z-10 md:col-span-2 w-full rounded-2xl border border-white/25 bg-gradient-to-r from-cyan-500/90 via-sky-500/90 to-emerald-400/90 px-5 py-5 shadow-2xl backdrop-blur"
+          >
+            <div className="flex flex-col gap-3 text-white md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 border border-white/35">
+                  <Snowflake className="h-8 w-8" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/80">The Secret Word is</p>
+                  <p className="text-3xl font-black leading-tight">Binary Blizzard</p>
+                  <p className="text-sm text-white/85">You cracked the holiday riddle—celebrate the storm.</p>
+                </div>
+              </div>
+              <PartyPopper className="h-10 w-10 drop-shadow" />
+            </div>
+          </motion.div>
         )}
 
         <div className="relative z-10 flex items-start gap-3">
@@ -254,28 +297,6 @@ export function TopicSelection({
             <p className={`text-sm ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
               What do snowbound coders call a storm of 1s and 0s? Pick the two words to name it.
             </p>
-
-            {blizzardActive && (
-              <motion.div
-                initial={{ scale: 0.97, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-                className="mt-3 w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-5 shadow-2xl backdrop-blur"
-              >
-                <div className="flex items-center gap-4 text-white">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/15 border border-white/25">
-                    <Snowflake className="h-8 w-8" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[11px] uppercase tracking-[0.35em] text-white/80">The Secret Word is</p>
-                    <p className="text-2xl font-extrabold leading-tight">Binary Blizzard</p>
-                    <p className="text-sm text-white/75">You unlocked the storm—share the win!</p>
-                  </div>
-                </div>
-                <PartyPopper className="h-10 w-10 text-white drop-shadow" />
-              </motion.div>
-            )}
-
             <p className={`text-xs mt-1 ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
               Attempts: {attempts} / 5 before reveal unlocks
             </p>
