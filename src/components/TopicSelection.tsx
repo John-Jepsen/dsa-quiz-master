@@ -51,11 +51,14 @@ export function TopicSelection({
     'The weather word is not a breeze.',
     'If you think winter and bits, you’re close.'
   ];
-  const flyoverItems = [
-    { icon: '✈️', top: '12%', delay: 0, duration: 12 },
-    { icon: '🛩️', top: '58%', delay: 2.5, duration: 14 },
-    { icon: '💻', top: '32%', delay: 1.2, duration: 16 },
-    { icon: '🖥️', top: '78%', delay: 3.2, duration: 18 },
+  const burstConfetti = [
+    { icon: '✈️', from: { x: '-10%', y: '-10%' }, to: { x: '30%', y: '25%' }, delay: 0 },
+    { icon: '🛩️', from: { x: '110%', y: '-10%' }, to: { x: '65%', y: '28%' }, delay: 0.08 },
+    { icon: '💻', from: { x: '-8%', y: '108%' }, to: { x: '35%', y: '72%' }, delay: 0.12 },
+    { icon: '🖥️', from: { x: '108%', y: '105%' }, to: { x: '70%', y: '70%' }, delay: 0.2 },
+    { icon: '🛰️', from: { x: '50%', y: '-12%' }, to: { x: '50%', y: '30%' }, delay: 0.05 },
+    { icon: '🎯', from: { x: '-12%', y: '50%' }, to: { x: '30%', y: '55%' }, delay: 0.1 },
+    { icon: '🚀', from: { x: '112%', y: '45%' }, to: { x: '70%', y: '50%' }, delay: 0.18 },
   ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -245,14 +248,19 @@ export function TopicSelection({
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_40%)]" />
             <div className="pointer-events-none absolute inset-0">
-              {flyoverItems.map((item, index) => (
+              {burstConfetti.map((item, index) => (
                 <motion.span
                   key={`${item.icon}-${index}`}
                   className="absolute text-3xl md:text-4xl drop-shadow-lg"
-                  style={{ top: item.top }}
-                  initial={{ x: '-15%', rotate: -5, opacity: 0 }}
-                  animate={{ x: '115%', rotate: 6, opacity: [0, 1, 1, 0] }}
-                  transition={{ duration: item.duration, delay: item.delay, repeat: Infinity, ease: 'linear' }}
+                  initial={{ x: item.from.x, y: item.from.y, scale: 0.4, opacity: 0 }}
+                  animate={{ x: item.to.x, y: item.to.y, scale: [0.8, 1.15, 0.7], opacity: [0, 1, 0] }}
+                  transition={{
+                    duration: 1.1,
+                    delay: item.delay,
+                    repeat: Infinity,
+                    repeatDelay: 1.6,
+                    ease: 'easeOut',
+                  }}
                 >
                   {item.icon}
                 </motion.span>
