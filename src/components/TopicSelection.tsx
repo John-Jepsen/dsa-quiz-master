@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload, Snowflake, PartyPopper } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
@@ -41,6 +41,7 @@ export function TopicSelection({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [puzzleSolved, setPuzzleSolved] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const blizzardActive = puzzleSolved || riddleState === 'answer';
 
   const wordOptionsOne = ['Binary', 'Bitwise', 'Snowy'];
   const wordOptionsTwo = ['Blizard', 'Breeze', 'Bugstorm'];
@@ -227,29 +228,80 @@ export function TopicSelection({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-lg border bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 p-4 flex flex-col md:flex-row md:items-start md:justify-between gap-3 shadow-sm"
+        className={`relative overflow-hidden rounded-lg border p-4 flex flex-col md:flex-row md:items-start md:justify-between gap-3 ${
+          blizzardActive
+            ? 'border-sky-300/80 bg-gradient-to-br from-slate-900 via-sky-900/80 to-cyan-800/80 shadow-2xl shadow-sky-500/30 ring-2 ring-cyan-300/60'
+            : 'bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 shadow-sm'
+        }`}
       >
-        <div className="flex items-start gap-3">
-          <div className="p-2 rounded-full bg-background shadow-inner">
-            <Sparkles className="h-5 w-5 text-primary" />
+        {blizzardActive && (
+          <>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_40%)]" />
+          </>
+        )}
+
+        <div className="relative z-10 flex items-start gap-3">
+          <div
+            className={`p-2 rounded-full ${blizzardActive ? 'bg-white/10 border border-white/20 shadow-lg' : 'bg-background shadow-inner'}`}
+          >
+            <Sparkles className={`h-5 w-5 ${blizzardActive ? 'text-white' : 'text-primary'}`} />
           </div>
-          <div>
-            <p className="font-semibold text-foreground">Holiday coding puzzle</p>
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <p className={`font-semibold ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Holiday coding puzzle</p>
+              {blizzardActive && (
+                <motion.span
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="px-2 py-1 text-[10px] uppercase tracking-[0.28em] rounded-full bg-white/15 text-white border border-white/25 shadow"
+                >
+                  Binary Blizard
+                </motion.span>
+              )}
+            </div>
+            <p className={`text-sm ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
               What do snowbound coders call a storm of 1s and 0s? Pick the two words to name it.
             </p>
-            {riddleState === 'answer' && (
-              <p className="text-sm font-semibold text-primary mt-1">Binary Blizard</p>
+
+            {blizzardActive && (
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                className="mt-1 flex items-center gap-3 rounded-lg border border-white/20 bg-white/10 px-3 py-2 shadow-lg backdrop-blur"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 border border-white/30 text-white">
+                  <Snowflake className="h-6 w-6" />
+                </div>
+                <div className="space-y-0.5 text-white">
+                  <p className="text-[10px] uppercase tracking-[0.32em] text-white/80">Binary Blizard</p>
+                  <p className="text-lg font-extrabold leading-tight">Blizzard unleashed</p>
+                  <p className="text-xs text-white/80">A storm of 1s and 0s just swept the quiz.</p>
+                </div>
+                <PartyPopper className="h-8 w-8 text-white drop-shadow" />
+              </motion.div>
             )}
-            <p className="text-xs text-muted-foreground mt-1">
+
+            <p className={`text-xs mt-1 ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
               Attempts: {attempts} / 5 before reveal unlocks
             </p>
-            {feedback && <p className="text-xs text-muted-foreground mt-1">{feedback}</p>}
+            {feedback && (
+              <p
+                className={`text-xs mt-1 ${
+                  blizzardActive
+                    ? 'px-3 py-2 rounded-md bg-white/10 text-white shadow border border-white/15'
+                    : 'text-muted-foreground'
+                }`}
+              >
+                {feedback}
+              </p>
+            )}
           </div>
         </div>
-        <div className="flex flex-col gap-3 w-full">
+        <div className="relative z-10 flex flex-col gap-3 w-full">
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium text-foreground">Pick word 1</p>
+            <p className={`text-sm font-medium ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Pick word 1</p>
             <div className="flex flex-wrap gap-2">
               {wordOptionsOne.map((word) => (
                 <Button
@@ -269,7 +321,7 @@ export function TopicSelection({
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium text-foreground">Pick word 2</p>
+            <p className={`text-sm font-medium ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Pick word 2</p>
             <div className="flex flex-wrap gap-2">
               {wordOptionsTwo.map((word) => (
                 <Button
@@ -290,9 +342,15 @@ export function TopicSelection({
           </div>
           <div className="flex flex-wrap gap-2 items-center">
             {puzzleSolved ? (
-              <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-red-500/80 via-amber-400/80 to-emerald-500/80 text-white font-extrabold uppercase tracking-wide shadow-lg flex items-center gap-2">
-                ❄️ Binary Blizard 🎄
-              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative w-full md:w-auto overflow-hidden px-4 py-3 rounded-lg bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400 text-white font-extrabold uppercase tracking-wide shadow-xl flex items-center gap-3 ring-2 ring-white/30"
+              >
+                <Snowflake className="h-6 w-6 drop-shadow" />
+                <span className="text-sm">Binary Blizard</span>
+                <span className="text-lg">Unleashed!</span>
+              </motion.div>
             ) : (
               <Button
                 variant="default"
@@ -309,7 +367,7 @@ export function TopicSelection({
                   if (isCorrect) {
                     setPuzzleSolved(true);
                     setRiddleState('answer');
-                    setFeedback('Binary Blizard unlocked! 🎄');
+                    setFeedback('Binary Blizard unleashed! ❄️🎉');
                   } else {
                     const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
                     const clue = clues[clueIndex];
@@ -320,7 +378,7 @@ export function TopicSelection({
                   }
                 }}
               >
-                Check answer
+                Unleash the blizzard
               </Button>
             )}
             <Button
@@ -345,7 +403,7 @@ export function TopicSelection({
                 if (puzzleSolved || attempts >= 5) {
                   setPuzzleSolved(true);
                   setRiddleState('answer');
-                  setFeedback('Revealed: Binary Blizard');
+                  setFeedback('Revealed: Binary Blizard — the storm is official. ❄️');
                 } else {
                   setFeedback(`Make ${5 - attempts} more attempt(s) before revealing.`);
                 }
