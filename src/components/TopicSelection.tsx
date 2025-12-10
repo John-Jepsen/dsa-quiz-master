@@ -334,23 +334,7 @@ export function TopicSelection({
             </div>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            {puzzleSolved ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative w-full overflow-hidden px-5 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400 text-white shadow-xl ring-2 ring-white/40"
-              >
-                <div className="flex items-center gap-4">
-                  <Snowflake className="h-8 w-8 drop-shadow" />
-                  <div className="space-y-1">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/80">The Secret Word is</p>
-                    <p className="text-2xl font-black leading-tight">Binary Blizzard</p>
-                    <p className="text-sm text-white/85">You cracked the holiday riddle.</p>
-                  </div>
-                  <PartyPopper className="h-7 w-7 drop-shadow" />
-                </div>
-              </motion.div>
-            ) : (
+            {puzzleSolved ? null : (
               <Button
                 variant="default"
                 onClick={() => {
