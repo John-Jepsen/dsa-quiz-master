@@ -115,7 +115,30 @@ export function TopicSelection({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <>
+      {blizzardActive && (
+        <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+          {burstConfetti.map((item, index) => (
+            <motion.span
+              key={`burst-${item.icon}-${index}`}
+              className="absolute text-4xl md:text-5xl drop-shadow-lg"
+              initial={{ x: item.from.x, y: item.from.y, scale: 0.4, opacity: 0 }}
+              animate={{ x: item.to.x, y: item.to.y, scale: [0.6, 1.3, 0.6], opacity: [0, 1, 0] }}
+              transition={{
+                duration: 0.9,
+                delay: item.delay,
+                repeat: Infinity,
+                repeatDelay: 0.9,
+                ease: 'easeOut',
+              }}
+            >
+              {item.icon}
+            </motion.span>
+          ))}
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto p-6 space-y-8 relative z-10">
       {/* User Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -247,25 +270,6 @@ export function TopicSelection({
           <>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_40%)]" />
-            <div className="pointer-events-none absolute inset-0">
-              {burstConfetti.map((item, index) => (
-                <motion.span
-                  key={`${item.icon}-${index}`}
-                  className="absolute text-3xl md:text-4xl drop-shadow-lg"
-                  initial={{ x: item.from.x, y: item.from.y, scale: 0.4, opacity: 0 }}
-                  animate={{ x: item.to.x, y: item.to.y, scale: [0.8, 1.15, 0.7], opacity: [0, 1, 0] }}
-                  transition={{
-                    duration: 1.1,
-                    delay: item.delay,
-                    repeat: Infinity,
-                    repeatDelay: 1.6,
-                    ease: 'easeOut',
-                  }}
-                >
-                  {item.icon}
-                </motion.span>
-              ))}
-            </div>
           </>
         )}
 
@@ -555,5 +559,6 @@ export function TopicSelection({
         </motion.div>
       )}
     </div>
+    </>
   );
 }
