@@ -13,7 +13,7 @@ This guide keeps contributors aligned with how DSA Quiz Master is organized, bui
 - `npm run dev` — start the Vite dev server with fast HMR.
 - `npm run build` — type-check via `tsc -b --noCheck`, then create a production build and copy `404.html` to `dist/`.
 - `npm run preview` — serve the built app locally to verify the production bundle.
-- `npm run lint` — run ESLint across the repo.
+- `npm run lint` — run ESLint (flat config in `eslint.config.js`, permissive ruleset that keeps React hooks checks).
 - `npm test` — run the Vitest suite once in jsdom; use `npm run test:watch` while iterating.
 
 ## Coding Style & Naming Conventions
