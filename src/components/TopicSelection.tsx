@@ -8,7 +8,7 @@ import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 import { ProgressSubmission } from './ProgressSubmission';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 interface TopicSelectionProps {
@@ -51,27 +51,6 @@ export function TopicSelection({
     'The weather word is not a breeze.',
     'If you think winter and bits, you’re close.'
   ];
-  const burstConfetti = useMemo(() => {
-    const icons = ['✈️', '🛩️', '🚀', '💻', '🖥️', '🛰️', '🎯', '🎉', '❄️', '✨'];
-    return Array.from({ length: 18 }, (_, index) => ({
-      icon: icons[index % icons.length],
-      x: Math.random() * 100,
-      y: Math.random() * 90,
-      delay: index * 0.035,
-    }));
-  }, []);
-
-  const rainConfetti = useMemo(() => {
-    const icons = ['🛩️', '💻', '🖥️', '🚀', '🛰️', '✈️', '🎯', '✨', '🎉'];
-    return Array.from({ length: 20 }, () => ({
-      icon: icons[Math.floor(Math.random() * icons.length)],
-      x: Math.random() * 100,
-      delay: Math.random() * 1.5,
-      duration: 5 + Math.random() * 3,
-      rotateStart: -30 + Math.random() * 60,
-      rotateEnd: 30 + Math.random() * 90,
-    }));
-  }, []);
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -127,52 +106,7 @@ export function TopicSelection({
   };
 
   return (
-    <>
-      {blizzardActive && (
-        <div className="pointer-events-none fixed inset-0 z-[1000] overflow-hidden">
-          {burstConfetti.map((item, index) => (
-            <motion.span
-              key={`burst-${item.icon}-${index}`}
-              className="absolute text-4xl md:text-5xl drop-shadow-lg"
-              initial={{ x: '50vw', y: '50vh', scale: 0.2, opacity: 0, rotate: -10 }}
-              animate={{
-                x: `${item.x}%`,
-                y: `${item.y}%`,
-                scale: [0.7, 1.3, 0.8],
-                opacity: [0, 1, 0],
-                rotate: [0, 15, -10],
-              }}
-              transition={{
-                duration: 1,
-                delay: item.delay,
-                repeat: Infinity,
-                repeatDelay: 1.2,
-                ease: 'easeOut',
-              }}
-            >
-              {item.icon}
-            </motion.span>
-          ))}
-          {rainConfetti.map((item, index) => (
-            <motion.span
-              key={`rain-${item.icon}-${index}`}
-              className="absolute text-3xl md:text-4xl drop-shadow-lg"
-              initial={{ x: item.x, y: '-20%', rotate: -10, opacity: 0 }}
-              animate={{ x: item.x, y: '115%', rotate: [item.rotateStart, item.rotateEnd], opacity: [0, 1, 1, 0] }}
-              transition={{
-                duration: item.duration,
-                delay: item.delay,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-            >
-              {item.icon}
-            </motion.span>
-          ))}
-        </div>
-      )}
-
-      <div className="max-w-6xl mx-auto p-6 space-y-8 relative z-10">
+    <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* User Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -593,6 +527,5 @@ export function TopicSelection({
         </motion.div>
       )}
     </div>
-    </>
   );
 }
