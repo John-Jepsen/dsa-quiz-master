@@ -52,13 +52,26 @@ export function TopicSelection({
     'If you think winter and bits, you’re close.'
   ];
   const burstConfetti = [
-    { icon: '✈️', from: { x: '-10%', y: '-10%' }, to: { x: '30%', y: '25%' }, delay: 0 },
-    { icon: '🛩️', from: { x: '110%', y: '-10%' }, to: { x: '65%', y: '28%' }, delay: 0.08 },
-    { icon: '💻', from: { x: '-8%', y: '108%' }, to: { x: '35%', y: '72%' }, delay: 0.12 },
-    { icon: '🖥️', from: { x: '108%', y: '105%' }, to: { x: '70%', y: '70%' }, delay: 0.2 },
-    { icon: '🛰️', from: { x: '50%', y: '-12%' }, to: { x: '50%', y: '30%' }, delay: 0.05 },
-    { icon: '🎯', from: { x: '-12%', y: '50%' }, to: { x: '30%', y: '55%' }, delay: 0.1 },
-    { icon: '🚀', from: { x: '112%', y: '45%' }, to: { x: '70%', y: '50%' }, delay: 0.18 },
+    { icon: '✈️', to: { x: '6%', y: '14%' }, delay: 0 },
+    { icon: '🛩️', to: { x: '20%', y: '26%' }, delay: 0.05 },
+    { icon: '🚀', to: { x: '38%', y: '12%' }, delay: 0.08 },
+    { icon: '💻', to: { x: '55%', y: '20%' }, delay: 0.12 },
+    { icon: '🖥️', to: { x: '72%', y: '32%' }, delay: 0.16 },
+    { icon: '🛰️', to: { x: '92%', y: '18%' }, delay: 0.2 },
+    { icon: '🎯', to: { x: '12%', y: '64%' }, delay: 0.24 },
+    { icon: '🎉', to: { x: '32%', y: '78%' }, delay: 0.28 },
+    { icon: '❄️', to: { x: '55%', y: '86%' }, delay: 0.32 },
+    { icon: '✨', to: { x: '74%', y: '70%' }, delay: 0.36 },
+    { icon: '✈️', to: { x: '90%', y: '58%' }, delay: 0.4 },
+  ];
+  const rainConfetti = [
+    { icon: '🛩️', x: '6%', delay: 0 },
+    { icon: '💻', x: '22%', delay: 0.6 },
+    { icon: '🖥️', x: '38%', delay: 1.1 },
+    { icon: '🚀', x: '52%', delay: 0.4 },
+    { icon: '🛰️', x: '66%', delay: 0.9 },
+    { icon: '✈️', x: '80%', delay: 1.3 },
+    { icon: '🎯', x: '94%', delay: 1.7 },
   ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -122,14 +135,30 @@ export function TopicSelection({
             <motion.span
               key={`burst-${item.icon}-${index}`}
               className="absolute text-4xl md:text-5xl drop-shadow-lg"
-              initial={{ x: item.from.x, y: item.from.y, scale: 0.4, opacity: 0 }}
-              animate={{ x: item.to.x, y: item.to.y, scale: [0.6, 1.3, 0.6], opacity: [0, 1, 0] }}
+              initial={{ x: '50%', y: '50%', scale: 0.2, opacity: 0 }}
+              animate={{ x: item.to.x, y: item.to.y, scale: [0.8, 1.5, 0.8], opacity: [0, 1, 0] }}
               transition={{
-                duration: 0.9,
+                duration: 1,
                 delay: item.delay,
                 repeat: Infinity,
-                repeatDelay: 0.9,
+                repeatDelay: 1.2,
                 ease: 'easeOut',
+              }}
+            >
+              {item.icon}
+            </motion.span>
+          ))}
+          {rainConfetti.map((item, index) => (
+            <motion.span
+              key={`rain-${item.icon}-${index}`}
+              className="absolute text-3xl md:text-4xl drop-shadow-lg"
+              initial={{ x: item.x, y: '-20%', rotate: -10, opacity: 0 }}
+              animate={{ x: item.x, y: '120%', rotate: 10, opacity: [0, 1, 1, 0] }}
+              transition={{
+                duration: 5.5,
+                delay: item.delay,
+                repeat: Infinity,
+                ease: 'linear',
               }}
             >
               {item.icon}
