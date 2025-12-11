@@ -8,7 +8,7 @@ import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 import { ProgressSubmission } from './ProgressSubmission';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
 interface TopicSelectionProps {
@@ -51,28 +51,27 @@ export function TopicSelection({
     'The weather word is not a breeze.',
     'If you think winter and bits, you’re close.'
   ];
-  const burstConfetti = [
-    { icon: '✈️', to: { x: '6%', y: '14%' }, delay: 0 },
-    { icon: '🛩️', to: { x: '20%', y: '26%' }, delay: 0.05 },
-    { icon: '🚀', to: { x: '38%', y: '12%' }, delay: 0.08 },
-    { icon: '💻', to: { x: '55%', y: '20%' }, delay: 0.12 },
-    { icon: '🖥️', to: { x: '72%', y: '32%' }, delay: 0.16 },
-    { icon: '🛰️', to: { x: '92%', y: '18%' }, delay: 0.2 },
-    { icon: '🎯', to: { x: '12%', y: '64%' }, delay: 0.24 },
-    { icon: '🎉', to: { x: '32%', y: '78%' }, delay: 0.28 },
-    { icon: '❄️', to: { x: '55%', y: '86%' }, delay: 0.32 },
-    { icon: '✨', to: { x: '74%', y: '70%' }, delay: 0.36 },
-    { icon: '✈️', to: { x: '90%', y: '58%' }, delay: 0.4 },
-  ];
-  const rainConfetti = [
-    { icon: '🛩️', x: '6%', delay: 0 },
-    { icon: '💻', x: '22%', delay: 0.6 },
-    { icon: '🖥️', x: '38%', delay: 1.1 },
-    { icon: '🚀', x: '52%', delay: 0.4 },
-    { icon: '🛰️', x: '66%', delay: 0.9 },
-    { icon: '✈️', x: '80%', delay: 1.3 },
-    { icon: '🎯', x: '94%', delay: 1.7 },
-  ];
+  const burstConfetti = useMemo(() => {
+    const icons = ['✈️', '🛩️', '🚀', '💻', '🖥️', '🛰️', '🎯', '🎉', '❄️', '✨'];
+    return Array.from({ length: 18 }, (_, index) => ({
+      icon: icons[index % icons.length],
+      x: Math.random() * 100,
+      y: Math.random() * 90,
+      delay: index * 0.035,
+    }));
+  }, []);
+
+  const rainConfetti = useMemo(() => {
+    const icons = ['🛩️', '💻', '🖥️', '🚀', '🛰️', '✈️', '🎯', '✨', '🎉'];
+    return Array.from({ length: 20 }, () => ({
+      icon: icons[Math.floor(Math.random() * icons.length)],
+      x: Math.random() * 100,
+      delay: Math.random() * 1.5,
+      duration: 5 + Math.random() * 3,
+      rotateStart: -30 + Math.random() * 60,
+      rotateEnd: 30 + Math.random() * 90,
+    }));
+  }, []);
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -130,13 +129,19 @@ export function TopicSelection({
   return (
     <>
       {blizzardActive && (
-        <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+        <div className="pointer-events-none fixed inset-0 z-[1000] overflow-hidden">
           {burstConfetti.map((item, index) => (
             <motion.span
               key={`burst-${item.icon}-${index}`}
               className="absolute text-4xl md:text-5xl drop-shadow-lg"
-              initial={{ x: '50%', y: '50%', scale: 0.2, opacity: 0 }}
-              animate={{ x: item.to.x, y: item.to.y, scale: [0.8, 1.5, 0.8], opacity: [0, 1, 0] }}
+              initial={{ x: '50vw', y: '50vh', scale: 0.2, opacity: 0, rotate: -10 }}
+              animate={{
+                x: `${item.x}%`,
+                y: `${item.y}%`,
+                scale: [0.7, 1.3, 0.8],
+                opacity: [0, 1, 0],
+                rotate: [0, 15, -10],
+              }}
               transition={{
                 duration: 1,
                 delay: item.delay,
@@ -153,9 +158,9 @@ export function TopicSelection({
               key={`rain-${item.icon}-${index}`}
               className="absolute text-3xl md:text-4xl drop-shadow-lg"
               initial={{ x: item.x, y: '-20%', rotate: -10, opacity: 0 }}
-              animate={{ x: item.x, y: '120%', rotate: 10, opacity: [0, 1, 1, 0] }}
+              animate={{ x: item.x, y: '115%', rotate: [item.rotateStart, item.rotateEnd], opacity: [0, 1, 1, 0] }}
               transition={{
-                duration: 5.5,
+                duration: item.duration,
                 delay: item.delay,
                 repeat: Infinity,
                 ease: 'linear',
