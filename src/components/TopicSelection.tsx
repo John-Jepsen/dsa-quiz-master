@@ -3,13 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload, Snowflake, PartyPopper } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
 import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 import { ProgressSubmission } from './ProgressSubmission';
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
 
 interface TopicSelectionProps {
   onTopicSelect: (topicId: string) => void;
@@ -35,22 +34,7 @@ export function TopicSelection({
   moduleScores
 }: TopicSelectionProps) {
   const [showProgressSubmission, setShowProgressSubmission] = useState(false);
-  const [riddleState, setRiddleState] = useState<'idle' | 'hint' | 'answer'>('idle');
-  const [firstWord, setFirstWord] = useState<string | null>(null);
-  const [secondWord, setSecondWord] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [puzzleSolved, setPuzzleSolved] = useState(false);
-  const [attempts, setAttempts] = useState(0);
-  const blizzardActive = puzzleSolved || riddleState === 'answer';
 
-  const wordOptionsOne = ['Binary', 'Bitwise', 'Snowy'];
-  const wordOptionsTwo = ['Blizard', 'Breeze', 'Bugstorm'];
-  const clues = [
-    'It is icy and digital—two words.',
-    'Both words start with B.',
-    'The weather word is not a breeze.',
-    'If you think winter and bits, you’re close.'
-  ];
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
       'squares-2x2': '⊞',
@@ -224,180 +208,7 @@ export function TopicSelection({
         </Card>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className={`relative overflow-hidden rounded-lg border p-4 grid gap-4 md:grid-cols-2 md:items-start ${
-          blizzardActive
-            ? 'border-sky-300/80 bg-gradient-to-br from-slate-900 via-sky-900/80 to-cyan-800/80 shadow-2xl shadow-sky-500/30 ring-2 ring-cyan-300/60'
-            : 'bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 shadow-sm'
-        }`}
-      >
-        {blizzardActive && (
-          <>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.12),transparent_40%)]" />
-          </>
-        )}
 
-        {blizzardActive && (
-          <motion.div
-            initial={{ scale: 0.97, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-            className="relative z-10 md:col-span-2 w-full rounded-2xl border border-white/25 bg-gradient-to-r from-cyan-500/90 via-sky-500/90 to-emerald-400/90 px-5 py-5 shadow-2xl backdrop-blur"
-          >
-            <div className="flex flex-col gap-3 text-white md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20 border border-white/35">
-                  <Snowflake className="h-8 w-8" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[11px] uppercase tracking-[0.35em] text-white/80">The Secret Word is</p>
-                  <p className="text-3xl font-black leading-tight">Binary Blizzard</p>
-                  <p className="text-sm text-white/85">You cracked the holiday riddle—celebrate the storm.</p>
-                </div>
-              </div>
-              <PartyPopper className="h-10 w-10 drop-shadow" />
-            </div>
-          </motion.div>
-        )}
-
-        <div className="relative z-10 flex items-start gap-3">
-          <div
-            className={`p-2 rounded-full ${blizzardActive ? 'bg-white/10 border border-white/20 shadow-lg' : 'bg-background shadow-inner'}`}
-          >
-            <Sparkles className={`h-5 w-5 ${blizzardActive ? 'text-white' : 'text-primary'}`} />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <p className={`font-semibold ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Holiday coding puzzle</p>
-            </div>
-            <p className={`text-sm ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
-              What do snowbound coders call a storm of 1s and 0s? Pick the two words to name it.
-            </p>
-            <p className={`text-xs mt-1 ${blizzardActive ? 'text-white/80' : 'text-muted-foreground'}`}>
-              Attempts: {attempts} / 5 before reveal unlocks
-            </p>
-            {feedback && (
-              <p
-                className={`text-xs mt-1 ${
-                  blizzardActive
-                    ? 'px-3 py-2 rounded-md bg-white/10 text-white shadow border border-white/15'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                {feedback}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="relative z-10 flex flex-col gap-3 w-full">
-          <div className="flex flex-col gap-2">
-            <p className={`text-sm font-medium ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Pick word 1</p>
-            <div className="flex flex-wrap gap-2">
-              {wordOptionsOne.map((word) => (
-                <Button
-                  key={word}
-                  variant={firstWord === word ? 'default' : 'outline'}
-                  onClick={() => {
-                    const nextWord = firstWord === word ? null : word;
-                    setFirstWord(nextWord);
-                    setFeedback(null);
-                    setPuzzleSolved(false);
-                    if (riddleState !== 'idle') setRiddleState('idle');
-                  }}
-                >
-                  {word}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <p className={`text-sm font-medium ${blizzardActive ? 'text-white' : 'text-foreground'}`}>Pick word 2</p>
-            <div className="flex flex-wrap gap-2">
-              {wordOptionsTwo.map((word) => (
-                <Button
-                  key={word}
-                  variant={secondWord === word ? 'default' : 'outline'}
-                  onClick={() => {
-                    const nextWord = secondWord === word ? null : word;
-                    setSecondWord(nextWord);
-                    setFeedback(null);
-                    setPuzzleSolved(false);
-                    if (riddleState !== 'idle') setRiddleState('idle');
-                  }}
-                >
-                  {word}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2 items-center">
-            {puzzleSolved ? null : (
-              <Button
-                variant="default"
-                onClick={() => {
-                  if (!firstWord || !secondWord) {
-                    setFeedback('Pick both words first.');
-                    return;
-                  }
-                  const nextAttempts = attempts + 1;
-                  setAttempts(nextAttempts);
-
-                  const normalized = `${firstWord} ${secondWord}`.toLowerCase();
-                  const isCorrect = normalized === 'binary blizard' || normalized === 'binary blizzard';
-                  if (isCorrect) {
-                    setPuzzleSolved(true);
-                    setRiddleState('answer');
-                    setFeedback('The secret word is Binary Blizzard! ❄️🎉');
-                  } else {
-                    const clueIndex = Math.min(nextAttempts - 1, clues.length - 1);
-                    const clue = clues[clueIndex];
-                    const remaining = Math.max(0, 5 - nextAttempts);
-                    const extra = remaining > 0 ? ` ${remaining} more before reveal unlocks.` : ' You can reveal now.';
-                    setFeedback(`Close. ${clue}${extra}`);
-                    setRiddleState('hint');
-                  }
-                }}
-              >
-                Unleash the blizzard
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setFirstWord(null);
-                setSecondWord(null);
-                setFeedback(null);
-                setPuzzleSolved(false);
-                setRiddleState('idle');
-                setAttempts(0);
-              }}
-            >
-              Reset
-            </Button>
-            <Button
-              size="sm"
-              variant={riddleState === 'answer' ? 'outline' : 'default'}
-              disabled={!puzzleSolved && attempts < 5}
-              onClick={() => {
-                if (puzzleSolved || attempts >= 5) {
-                  setPuzzleSolved(true);
-                  setRiddleState('answer');
-                  setFeedback('Revealed: The secret word is Binary Blizzard. ❄️');
-                } else {
-                  setFeedback(`Make ${5 - attempts} more attempt(s) before revealing.`);
-                }
-              }}
-            >
-              {riddleState === 'answer' ? 'Solved!' : attempts < 5 ? 'Reveal after 5 attempts' : 'Reveal answer'}
-            </Button>
-          </div>
-        </div>
-      </motion.div>
 
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Choose a Topic</h2>
