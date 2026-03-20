@@ -117,25 +117,23 @@ export function AchievementsPage({ onBack }: AchievementsPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="hover:bg-secondary"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">🏆 Achievements</h1>
-              <p className="text-muted-foreground mt-1">
-                Track your progress and unlock rewards
-              </p>
-            </div>
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="hover:bg-secondary shrink-0"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+            Back
+          </Button>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Achievements</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Track your progress and unlock rewards
+            </p>
           </div>
         </div>
 
@@ -148,9 +146,9 @@ export function AchievementsPage({ onBack }: AchievementsPageProps) {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-4 mb-6">
+        <div className="flex flex-wrap gap-3 sm:gap-4 mb-6">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
@@ -183,7 +181,7 @@ export function AchievementsPage({ onBack }: AchievementsPageProps) {
           </Select>
 
           <Select value={selectedRarity} onValueChange={setSelectedRarity}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by rarity" />
             </SelectTrigger>
             <SelectContent>

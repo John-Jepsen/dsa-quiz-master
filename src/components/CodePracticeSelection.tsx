@@ -38,14 +38,14 @@ export function CodePracticeSelection({ onExerciseSelect, onBack }: CodePractice
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={onBack}>
-          ← Back to Topics
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <Button variant="outline" size="sm" onClick={onBack}>
+          ← Back
         </Button>
         <div className="flex items-center gap-2">
-          <Code size={24} />
-          <h1 className="text-2xl font-bold">Code Practice</h1>
+          <Code size={20} className="sm:w-6 sm:h-6" />
+          <h1 className="text-xl sm:text-2xl font-bold">Code Practice</h1>
         </div>
       </div>
 
