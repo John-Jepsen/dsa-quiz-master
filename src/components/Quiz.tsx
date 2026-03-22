@@ -83,17 +83,17 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={onExit}>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button variant="outline" size="sm" onClick={onExit}>
             ← Back
           </Button>
-          <div className="text-sm text-muted-foreground">
-            Question {currentQuestionIndex + 1} of {questions.length}
+          <div className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+            {currentQuestionIndex + 1}/{questions.length}
           </div>
         </div>
-        <div className="text-sm font-medium">
+        <div className="text-xs sm:text-sm font-medium whitespace-nowrap">
           Score: {score}/{questions.length}
         </div>
       </div>
@@ -110,11 +110,11 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
         >
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl leading-relaxed">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:justify-between">
+                <CardTitle className="text-base sm:text-xl leading-relaxed">
                   {currentQuestion.question}
                 </CardTitle>
-                <Badge className={getDifficultyColor(currentQuestion.difficulty)}>
+                <Badge className={`${getDifficultyColor(currentQuestion.difficulty)} shrink-0 self-start`}>
                   {currentQuestion.difficulty}
                 </Badge>
               </div>
@@ -178,7 +178,7 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
                       <p className="text-sm leading-relaxed">{currentQuestion.explanation}</p>
 
                       {(currentQuestion.timeComplexity || currentQuestion.spaceComplexity) && (
-                        <div className="flex gap-4 mt-4 pt-4 border-t">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 pt-4 border-t">
                           {currentQuestion.timeComplexity && (
                             <div className="flex items-center gap-2">
                               <Clock size={16} className="text-muted-foreground" />

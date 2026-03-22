@@ -156,9 +156,9 @@ export function CodePractice({ exercise, onComplete, onBack }: CodePracticeProps
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" size="sm" onClick={onBack}>
           ← Back
         </Button>
         <Badge className={getDifficultyColor(exercise.difficulty)}>
@@ -178,8 +178,8 @@ export function CodePractice({ exercise, onComplete, onBack }: CodePracticeProps
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Code Editor */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Code Editor</h3>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base sm:text-lg font-semibold">Code Editor</h3>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -187,16 +187,16 @@ export function CodePractice({ exercise, onComplete, onBack }: CodePracticeProps
                     onClick={resetCode}
                     disabled={isRunning}
                   >
-                    <RotateCcw size={16} className="mr-1" />
-                    Reset
+                    <RotateCcw size={14} className="sm:mr-1" />
+                    <span className="hidden sm:inline">Reset</span>
                   </Button>
                   <Button
                     onClick={executeCode}
                     disabled={isRunning}
-                    className="min-w-[100px]"
+                    size="sm"
                   >
-                    <Play size={16} className="mr-1" />
-                    {isRunning ? 'Running...' : 'Run Code'}
+                    <Play size={14} className="mr-1" />
+                    {isRunning ? 'Running...' : 'Run'}
                   </Button>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export function CodePractice({ exercise, onComplete, onBack }: CodePracticeProps
                   onKeyDown={handleKeyDown}
                   onPaste={handlePaste}
                   onContextMenu={handleContextMenu}
-                  className="w-full h-64 p-4 font-mono text-sm bg-background border-0 outline-none resize-none"
+                  className="w-full h-48 sm:h-64 p-3 sm:p-4 font-mono text-xs sm:text-sm bg-background border-0 outline-none resize-none"
                   placeholder="Type your code here..."
                   style={{ tabSize: 2 }}
                 />

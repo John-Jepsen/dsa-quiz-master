@@ -102,42 +102,42 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Profile</h1>
-            <p className="text-muted-foreground">Manage your account and view your progress</p>
+        <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Profile</h1>
+            <p className="text-sm text-muted-foreground">Manage your account and view your progress</p>
           </div>
-          <Button onClick={onBack} variant="outline">Back</Button>
+          <Button onClick={onBack} variant="outline" size="sm" className="shrink-0">Back</Button>
         </div>
 
         <div className="space-y-6">
           {/* Profile Header */}
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-16 h-16">
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:justify-between">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <Avatar className="w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-base sm:text-lg">
                       {getInitials(displayName)}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <h2 className="text-2xl font-bold text-foreground">{displayName}</h2>
-                    <p className="text-muted-foreground">@{user.username}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground truncate">{displayName}</h2>
+                    <p className="text-muted-foreground text-sm">@{user.username}</p>
+                    <div className="flex items-center gap-2 mt-1 sm:mt-2">
+                      <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-xs sm:text-sm text-muted-foreground">
                         Joined {formatDate(user.createdAt)}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 self-end sm:self-auto shrink-0">
                   <Button
                     onClick={() => setIsEditing(true)}
                     variant="outline"
                     size="sm"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1 sm:gap-2"
                   >
                     <Settings className="w-4 h-4" />
                     Edit
@@ -146,7 +146,7 @@ export function UserProfileComponent({ user, onBack, onLogout, onUpdateProfile }
                     onClick={onLogout}
                     variant="outline"
                     size="sm"
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                    className="flex items-center gap-1 sm:gap-2 text-destructive hover:text-destructive"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout

@@ -90,43 +90,44 @@ export function TopicSelection({
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
       {/* User Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        <div className="flex items-center gap-4">
-          <Avatar className="w-12 h-12">
-            <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Avatar className="w-10 h-10 sm:w-12 sm:h-12 shrink-0">
+            <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm sm:text-base">
               {currentUser ? getInitials(currentUser.displayName || currentUser.username) : 'U'}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h2 className="text-xl font-semibold">Welcome back, {currentUser?.displayName || currentUser?.username}!</h2>
-            <p className="text-muted-foreground">Ready to level up your DSA skills?</p>
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-semibold truncate">Welcome back, {currentUser?.displayName || currentUser?.username}!</h2>
+            <p className="text-sm text-muted-foreground">Ready to level up your DSA skills?</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onViewProgress}>
-            <TrendingUp size={16} className="mr-2" />
-            Progress
+            <TrendingUp size={16} className="mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Progress</span>
+            <span className="sm:hidden">Stats</span>
           </Button>
           <Button variant="outline" size="sm" onClick={onViewProfile}>
-            <User size={16} className="mr-2" />
+            <User size={16} className="mr-1 sm:mr-2" />
             Profile
           </Button>
           {onViewAchievements && (
             <Button variant="outline" size="sm" onClick={onViewAchievements}>
-              <Award size={16} className="mr-2" />
-              Achievements
+              <Award size={16} className="sm:mr-2" />
+              <span className="hidden sm:inline">Achievements</span>
             </Button>
           )}
           {onViewLeaderboard && (
             <Button variant="outline" size="sm" onClick={onViewLeaderboard}>
-              <Trophy size={16} className="mr-2" />
-              Leaderboard
+              <Trophy size={16} className="sm:mr-2" />
+              <span className="hidden sm:inline">Leaderboard</span>
             </Button>
           )}
           <Button
@@ -134,8 +135,8 @@ export function TopicSelection({
             size="sm"
             onClick={() => setShowProgressSubmission(!showProgressSubmission)}
           >
-            <Upload size={16} className="mr-2" />
-            Submit Progress
+            <Upload size={16} className="sm:mr-2" />
+            <span className="hidden sm:inline">Submit Progress</span>
           </Button>
         </div>
       </motion.div>
@@ -145,7 +146,7 @@ export function TopicSelection({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl font-bold text-foreground"
+          className="text-2xl sm:text-4xl font-bold text-foreground"
         >
           DSA Quiz Master
         </motion.h1>

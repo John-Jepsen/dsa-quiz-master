@@ -70,25 +70,23 @@ export function LeaderboardPage({ onBack, currentUserId }: LeaderboardPageProps)
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onBack}
-              className="hover:bg-secondary"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">🏆 Leaderboard</h1>
-              <p className="text-muted-foreground mt-1">
-                See how you rank against other learners
-              </p>
-            </div>
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="hover:bg-secondary shrink-0"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
+            Back
+          </Button>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Leaderboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              See how you rank against other learners
+            </p>
           </div>
         </div>
 
@@ -175,44 +173,41 @@ export function LeaderboardPage({ onBack, currentUserId }: LeaderboardPageProps)
                     <div
                       key={entry.id}
                       className={cn(
-                        'flex items-center justify-between p-4 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors',
+                        'flex items-center justify-between p-3 sm:p-4 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors gap-2',
                         currentUserId === entry.userId && 'bg-blue-50 border-blue-200'
                       )}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                           {getRankIcon(entry.rank || index + 1)}
-                          <Avatar className="w-10 h-10">
-                            <AvatarFallback>
+                          <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
+                            <AvatarFallback className="text-xs sm:text-sm">
                               {entry.displayName?.charAt(0) || entry.username.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                         </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold">
+
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <span className="font-semibold text-sm sm:text-base truncate">
                               {entry.displayName || entry.username}
                             </span>
                             {currentUserId === entry.userId && (
-                              <Badge variant="secondary" className="text-xs">You</Badge>
+                              <Badge variant="secondary" className="text-xs shrink-0">You</Badge>
                             )}
                           </div>
-                          <div className="text-sm text-muted-foreground">
-                            {entry.completedModules} modules completed • {entry.achievementCount} achievements
+                          <div className="text-xs sm:text-sm text-muted-foreground truncate">
+                            {entry.completedModules} modules • {entry.achievementCount} achievements
                           </div>
                         </div>
                       </div>
 
-                      <div className="text-right space-y-1">
-                        <div className={cn('font-semibold', getScoreColor(entry.averageScore))}>
+                      <div className="text-right shrink-0">
+                        <div className={cn('font-semibold text-sm sm:text-base', getScoreColor(entry.averageScore))}>
                           {entry.averageScore.toFixed(1)}%
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-xs sm:text-sm text-muted-foreground">
                           {entry.totalQuizzes} quizzes
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {entry.totalScore} total pts
                         </div>
                       </div>
                     </div>

@@ -67,20 +67,20 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack}>
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Topics
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex items-center gap-3 sm:gap-4">
+        <Button variant="outline" size="sm" onClick={onBack}>
+          <ArrowLeft size={16} className="mr-1 sm:mr-2" />
+          Back
         </Button>
-        <h1 className="text-3xl font-bold">Your Progress</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Your Progress</h1>
       </div>
 
       {/* Overall Stats */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid md:grid-cols-4 gap-6"
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6"
       >
         <Card>
           <CardContent className="pt-6">
@@ -160,15 +160,15 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
                 transition={{ delay: index * 0.1 }}
               >
                 <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="text-2xl p-3 bg-card rounded-lg border">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <div className="text-xl sm:text-2xl p-2 sm:p-3 bg-card rounded-lg border shrink-0">
                           {getTopicIcon(topic.icon)}
                         </div>
-                        <div className="space-y-1">
-                          <h3 className="font-semibold text-lg">{topic.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                        <div className="space-y-1 min-w-0">
+                          <h3 className="font-semibold text-base sm:text-lg">{topic.name}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-1 sm:line-clamp-none">
                             {topic.description}
                           </p>
                           <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ export function ProgressTracking({ onBack, userProgress }: ProgressTrackingProps
                         </div>
                       </div>
 
-                      <div className="text-right space-y-2">
+                      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:space-y-2 sm:shrink-0 ml-auto sm:ml-0">
                         {progress.bestScore > 0 ? (
                           <Badge
                             className={`${getScoreColor(progress.bestScore)} text-sm px-3 py-1`}

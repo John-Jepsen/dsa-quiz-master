@@ -63,34 +63,36 @@ export function ModuleSelection({
     const progress = getTopicProgress();
 
     return (
-        <div className="max-w-6xl mx-auto p-6 space-y-6">
+        <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between"
+                className="space-y-4"
             >
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" onClick={onBack}>
-                        <ChevronLeft size={16} className="mr-1" />
-                        Back to Topics
-                    </Button>
-                    <div>
-                        <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <span className="text-2xl">{topic.icon === 'squares-2x2' ? '⊞' :
-                                topic.icon === 'link' ? '🔗' :
-                                    topic.icon === 'queue-list' ? '📋' :
-                                        topic.icon === 'folder-tree' ? '🌳' : '📚'}</span>
-                            {topic.name}
-                        </h1>
-                        <p className="text-muted-foreground">{topic.description}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                        <Button variant="outline" size="sm" onClick={onBack} className="self-start">
+                            <ChevronLeft size={16} className="mr-1" />
+                            Back
+                        </Button>
+                        <div className="min-w-0">
+                            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                                <span className="text-xl sm:text-2xl">{topic.icon === 'squares-2x2' ? '⊞' :
+                                    topic.icon === 'link' ? '🔗' :
+                                        topic.icon === 'queue-list' ? '📋' :
+                                            topic.icon === 'folder-tree' ? '🌳' : '📚'}</span>
+                                {topic.name}
+                            </h1>
+                            <p className="text-sm text-muted-foreground">{topic.description}</p>
+                        </div>
                     </div>
-                </div>
-                <div className="text-right">
-                    <div className="text-sm text-muted-foreground mb-1">
-                        Progress: {progress.completed}/{progress.total} modules
+                    <div className="flex items-center gap-3 sm:text-right sm:block">
+                        <Progress value={progress.percentage} className="w-24 sm:w-32" />
+                        <div className="text-sm text-muted-foreground whitespace-nowrap">
+                            {progress.completed}/{progress.total} modules
+                        </div>
                     </div>
-                    <Progress value={progress.percentage} className="w-32" />
                 </div>
             </motion.div>
 
@@ -101,11 +103,11 @@ export function ModuleSelection({
                 transition={{ delay: 0.1 }}
             >
                 <Tabs value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                    <TabsList className="grid w-full grid-cols-4 max-w-md">
-                        <TabsTrigger value="all">All</TabsTrigger>
-                        <TabsTrigger value="beginner">Beginner</TabsTrigger>
-                        <TabsTrigger value="intermediate">Intermediate</TabsTrigger>
-                        <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                    <TabsList className="flex w-full max-w-md overflow-x-auto">
+                        <TabsTrigger value="all" className="flex-1 min-w-0">All</TabsTrigger>
+                        <TabsTrigger value="beginner" className="flex-1 min-w-0">Beginner</TabsTrigger>
+                        <TabsTrigger value="intermediate" className="flex-1 min-w-0 text-xs sm:text-sm">Intermediate</TabsTrigger>
+                        <TabsTrigger value="advanced" className="flex-1 min-w-0">Advanced</TabsTrigger>
                     </TabsList>
                 </Tabs>
             </motion.div>
