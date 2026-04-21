@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { BookOpen, TrendingUp, Award, BarChart3, Trophy, User, Upload } from 'lucide-react';
-import { enhancedQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
+import { allQuizTopics, getTopicProgress } from '@/lib/quiz-modules';
 import { UserProfile } from '@/types';
 import { motion } from 'framer-motion';
 import { ProgressSubmission } from './ProgressSubmission';
@@ -42,13 +42,16 @@ export function TopicSelection({
       'queue-list': '📋',
       'folder-tree': '🌳',
       'chart-scatter': '📊',
-      'bars-arrow-up': '📈'
+      'bars-arrow-up': '📈',
+      'factory': '🏭',
+      'building': '🏗️',
+      'workflow': '⚙️',
     };
     return iconMap[iconName] || '📚';
   };
 
   const getTotalProgress = () => {
-    const allTopics = enhancedQuizTopics;
+    const allTopics = allQuizTopics;
     let totalCompleted = 0;
     let totalModules = 0;
 
@@ -68,11 +71,11 @@ export function TopicSelection({
   };
 
   const getTotalQuestions = () => {
-    return enhancedQuizTopics.reduce((sum, topic) => sum + topic.totalQuestions, 0);
+    return allQuizTopics.reduce((sum, topic) => sum + topic.totalQuestions, 0);
   };
 
   const getCompletedQuestions = () => {
-    return enhancedQuizTopics.reduce((sum, topic) => {
+    return allQuizTopics.reduce((sum, topic) => {
       const completedInTopic = topic.modules
         .filter(module => completedModules.includes(module.id))
         .reduce((moduleSum, module) => moduleSum + module.questionCount, 0);
@@ -173,7 +176,7 @@ export function TopicSelection({
                 <BookOpen size={24} className="text-primary" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{enhancedQuizTopics.length}</div>
+                <div className="text-2xl font-bold">{allQuizTopics.length}</div>
                 <div className="text-sm text-muted-foreground">Topics Available</div>
               </div>
             </div>
@@ -216,7 +219,7 @@ export function TopicSelection({
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {enhancedQuizTopics.map((topic, index) => {
+        {allQuizTopics.map((topic, index) => {
           const progress = getTopicProgress(topic.id, completedModules);
           const completionRate = progress.percentage;
           const topicScores = topic.modules

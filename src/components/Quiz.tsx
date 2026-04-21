@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Code, Clock, HardDrive } from 'lucide-react';
 import { QuizQuestion } from '@/lib/quiz-data';
+import { MermaidDiagram } from '@/components/MermaidDiagram';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface QuizProps {
@@ -127,6 +128,15 @@ export function Quiz({ questions, onComplete, onExit }: QuizProps) {
                   <pre className="text-sm font-mono overflow-x-auto">
                     <code>{currentQuestion.code}</code>
                   </pre>
+                </div>
+              )}
+              {currentQuestion.diagramSource && (
+                <div className="mt-4 p-4 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Code size={16} />
+                    <span className="text-sm font-medium">UML Diagram</span>
+                  </div>
+                  <MermaidDiagram source={currentQuestion.diagramSource} />
                 </div>
               )}
             </CardHeader>

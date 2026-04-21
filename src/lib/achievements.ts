@@ -174,6 +174,61 @@ export const ACHIEVEMENT_DEFINITIONS: Achievement[] = [
     rarity: 'legendary'
   },
 
+  // Design Patterns mastery achievements
+  {
+    id: 'creational-master',
+    name: 'Creational Master',
+    description: 'Complete all Creational Patterns modules',
+    icon: '🏭',
+    category: 'mastery',
+    condition: {
+      type: 'module_completion',
+      target: 5,
+      topicId: 'creational-patterns'
+    },
+    rarity: 'rare'
+  },
+  {
+    id: 'structural-master',
+    name: 'Structural Master',
+    description: 'Complete all Structural Patterns modules',
+    icon: '🏗️',
+    category: 'mastery',
+    condition: {
+      type: 'module_completion',
+      target: 7,
+      topicId: 'structural-patterns'
+    },
+    rarity: 'rare'
+  },
+  {
+    id: 'behavioral-master',
+    name: 'Behavioral Master',
+    description: 'Complete all Behavioral Patterns modules',
+    icon: '⚙️',
+    category: 'mastery',
+    condition: {
+      type: 'module_completion',
+      target: 11,
+      topicId: 'behavioral-patterns'
+    },
+    rarity: 'epic'
+  },
+  {
+    id: 'gof-master',
+    name: 'Gang of Four Master',
+    description: 'Complete all 23 Design Patterns modules',
+    icon: '📐',
+    category: 'mastery',
+    condition: {
+      type: 'module_completion',
+      target: 23,
+      topicId: 'design-patterns-all'
+    },
+    rarity: 'legendary',
+    isSecret: true
+  },
+
   // Secret achievements
   {
     id: 'speed-demon',
@@ -196,7 +251,7 @@ export const ACHIEVEMENT_DEFINITIONS: Achievement[] = [
     category: 'mastery',
     condition: {
       type: 'module_completion',
-      target: 22 // Total modules across all topics (6+5+5+6)
+      target: 55 // Total modules across all topics (32 DSA + 23 Design Patterns)
     },
     rarity: 'legendary',
     isSecret: true

@@ -19,7 +19,7 @@ import { CodePractice } from '@/components/CodePractice';
 import { AchievementsPage } from '@/components/AchievementsPage';
 import { LeaderboardPage } from '@/components/LeaderboardPage';
 import { FloatingSubmitButton } from '@/components/FloatingSubmitButton';
-import { enhancedQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
+import { allQuizTopics, getModuleById, QuizModule } from '@/lib/quiz-modules';
 import { quizQuestions, QuizQuestion } from '@/lib/quiz-data';
 import { moduleQuestions, getQuestionsByModule } from '@/lib/module-questions';
 import { CodeExercise } from '@/lib/code-exercises';
@@ -313,7 +313,7 @@ function AppContent() {
 
   const getCurrentTopicName = () => {
     if (currentTopic === 'random') return 'Mixed Topics';
-    const topic = enhancedQuizTopics.find(t => t.id === currentTopic);
+    const topic = allQuizTopics.find(t => t.id === currentTopic);
     return topic?.name || 'Unknown Topic';
   };
 
@@ -349,7 +349,7 @@ function AppContent() {
 
       {appState === 'module-selection' && currentUser && (
         <ModuleSelection
-          topic={enhancedQuizTopics.find(t => t.id === currentTopic)!}
+          topic={allQuizTopics.find(t => t.id === currentTopic)!}
           onModuleSelect={handleModuleSelect}
           onBack={handleBackToTopics}
           completedModules={completedModules}

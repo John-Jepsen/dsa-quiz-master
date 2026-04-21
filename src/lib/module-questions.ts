@@ -1381,19 +1381,24 @@ export const moduleQuestions = [
     }
 ];
 
+import { designPatternQuestions } from './design-pattern-questions';
+
+// All questions combined (DSA + Design Patterns)
+const allQuestions = [...moduleQuestions, ...designPatternQuestions];
+
 // Helper function to get questions by module ID
 export function getQuestionsByModule(moduleId: string) {
-    return moduleQuestions.filter(q => q.moduleId === moduleId);
+    return allQuestions.filter(q => q.moduleId === moduleId);
 }
 
 // Helper function to get all questions for a topic
 export function getQuestionsByTopic(topicId: string) {
-    return moduleQuestions.filter(q => q.topic === topicId);
+    return allQuestions.filter(q => q.topic === topicId);
 }
 
 // Get total question count for validation
 export function getTotalQuestionCount() {
-    return moduleQuestions.length;
+    return allQuestions.length;
 }
 
 // Get question count by module

@@ -10,6 +10,8 @@ export interface QuizQuestion {
   explanation: string;
   timeComplexity?: string;
   spaceComplexity?: string;
+  questionType?: 'multiple_choice' | 'uml';
+  diagramSource?: string; // Mermaid classDiagram source for UML questions
 }
 
 export interface QuizTopic {

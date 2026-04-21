@@ -388,19 +388,26 @@ export const enhancedQuizTopics: QuizTopic[] = [
     }
 ];
 
+import { designPatternTopics } from './design-pattern-modules';
+
+// All topics combined (DSA + Design Patterns)
+export const allQuizTopics: QuizTopic[] = [...enhancedQuizTopics, ...designPatternTopics];
+
 // Helper functions
 export function getModulesByTopic(topicId: string): QuizModule[] {
-    const topic = enhancedQuizTopics.find(t => t.id === topicId);
+    const topic = allQuizTopics.find(t => t.id === topicId);
     return topic?.modules || [];
 }
 
 export function getModuleById(moduleId: string): QuizModule | undefined {
-    for (const topic of enhancedQuizTopics) {
+    for (const topic of allQuizTopics) {
         const module = topic.modules.find(m => m.id === moduleId);
         if (module) return module;
     }
     return undefined;
 }
+
+export { designPatternTopics };
 
 export function getPrerequisiteModules(moduleId: string): QuizModule[] {
     const module = getModuleById(moduleId);
