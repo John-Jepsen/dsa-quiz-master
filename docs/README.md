@@ -6,9 +6,7 @@ A lean DSA quiz playground. The repo surface stays quiet; details live in `docs/
 ## Quickstart
 - `npm install`
 - `npm run dev` for local play
-- `npm run build` for production
-- `npm test` for Vitest + React Testing Library
-- `npm run lint` to enforce style
+
 
 ## Notes
 - Profiles, quizzes, and leaderboards run fully in-browser (IndexedDB).
